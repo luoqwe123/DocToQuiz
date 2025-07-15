@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "fix": "eslint --fix",
     "prepare": "husky",
-    "pnpm lint:lint-staged":"lint-staged"
+    "lint:lint-staged":"lint-staged"
   },
   "keywords": [],
   "author": "",
