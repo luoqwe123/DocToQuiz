@@ -1,12 +1,12 @@
 <template>
     <div class="App-container">
-
+        <RouterView></RouterView>
     </div>
 </template>
 
 <script setup lang='ts'>
+import { RouterView } from 'vue-router';
 
-console.log(111);
 
 </script>
 
