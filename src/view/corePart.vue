@@ -1,6 +1,6 @@
 <template>
-    <div class="Home-container">
-      <Layout></Layout>
+    <div class="container">
+        
     </div>
 </template>
 
@@ -9,7 +9,5 @@
 </script>
 
 <style lang="scss" scoped>
-
-
 
 </style>
