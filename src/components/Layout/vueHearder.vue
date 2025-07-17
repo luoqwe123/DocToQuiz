@@ -11,11 +11,11 @@
 
       <!-- 桌面端导航 -->
       <nav class="desktop-nav" v-if="!isMobile">
-        <div class="user-info" v-if="isLoggedIn">
+        <div class="user-info" v-if="!isLoggedIn">
           <span class="username">{{ props.username }}</span>
           <img class="avatar" :src="props.avatar" alt="用户头像" />
         </div>
-        <div class="auth-buttons" v-else>
+        <div class="auth-buttons">
           <el-button type=""  @click="login">登录</el-button>
           <el-button type="primary" @click="register">注册</el-button>
         </div>
@@ -60,9 +60,8 @@ const props = withDefaults(defineProps<{
   avatar:string
 }>(),{
   username:"访客",
-  avatar:"https://picsum.photos/200/200?random=1"
+  avatar:`@/../public/${Math.ceil(Math.random()*10)%4+140}.webp`
 })
-
 
 
 // 组件状态

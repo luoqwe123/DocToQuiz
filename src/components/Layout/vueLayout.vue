@@ -1,13 +1,13 @@
 <template>
     <div class="Layout-container">
         <div class="Layout-hearder">
-            <Hearder></Hearder>
+            <vueHearder></vueHearder>
         </div>
         <div class="Layout-center">
             <div class="intro">
                 <h1 style="color: #3451b2;">DocToQuiz</h1>
                 <h1>一个将pdf题库转化为在线做题的网站，帮助你更高效的复习！</h1>
-                <p style="font-size: 24px;color: #3C3C43C7;">A website that converts PDF question banks into online questions to help you revise more efficiently!</p>
+                <p style="font-size: clamp(18px,1.4rem,24px);color: #3C3C43C7;">A website that converts PDF question banks into online questions to help you revise more efficiently!</p>
                 <button type="button" class="start">开始使用</button>
             </div>
             <div class="content">
@@ -42,11 +42,14 @@
 
     gap: 20px;
     .intro{
-        font-size: 1.5rem;
+        font-size: clamp(24px,2.6rem,52px);
         display: flex;
         flex-direction: column;
         max-width: 576px;
         gap: 10px;
+        h1{
+            font-size: inherit;
+        }
         .start{
             margin-top: 30px;
             width: 96px;
