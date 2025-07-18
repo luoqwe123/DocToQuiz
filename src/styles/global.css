@@ -32,3 +32,6 @@ li{
     border-color: #4a90e2;
     background-color: #e7f0fa;
 }
+.disabled{
+    cursor: not-allowed !important;
+}

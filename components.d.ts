@@ -17,13 +17,10 @@ declare module 'vue' {
     QuestionCover: typeof import('./src/components/QuestionCover.vue')['default']
     QuestionNav: typeof import('./src/components/QuestionNav.vue')['default']
     QuestionShow: typeof import('./src/components/QuestionShow.vue')['default']
-    QustionCover: typeof import('./src/components/QustionCover.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShrinkButton: typeof import('./src/components/ShrinkButton.vue')['default']
-    VLayout: typeof import('./src/components/Layout/vueLayout.vue')['default']
     VueHearder: typeof import('./src/components/Layout/vueHearder.vue')['default']
     VueLayout: typeof import('./src/components/Layout/vueLayout.vue')['default']
-    VuwLayout: typeof import('./src/components/Layout/vueLayout.vue')['default']
   }
 }

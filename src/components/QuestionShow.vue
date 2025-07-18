@@ -1,10 +1,15 @@
 <template>
     <div class="QuestionsShow-container">
-        <div class="question"></div>
+        <div class="question">{{ props.question }}</div>
         <div class="options">
-            <label v-for="(item, key) in options" :key="key">
-                <input type="radio" :option="item.answer" @click="judg(item.answer)">
-                {{ item.select }}
+            <label v-for="(item, key) in props.select" :class="{
+                correct: (showAnswer||props.userAnswer) && key == props.answer,
+                disabled: showAnswer,
+                incorrect: (showAnswer && c_userAnswer != props.answer && c_userAnswer == key)||key == props.userAnswer
+
+            }" :key="key" >
+                <input type="radio" :value="key" @change="judg($event)" :disabled="showAnswer">
+                {{ key+'.'+ item }}
             </label>
 
         </div>
@@ -12,38 +17,69 @@
 </template>
 
 <script setup lang='ts'>
-// import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 
-let options = [
-    {
-        answer: "A",
-        select: "A.xxx"
-    },
-    {
-        answer: "B",
-        select: "B.xxx"
-    }
-]
+interface Option {
+    "A": string,
+    "B": string,
+    "C": string,
+    "D": string,
+}
 
-const judg = (option: string) => {
-    console.log(option)
+const props = withDefaults(defineProps<{
+    question: string;
+    select: Option;
+    answer: string,
+    userAnswer:string,
+    chooseRight:boolean
+}>(), {
+    question: "1+1等于多少",
+    select:()=>{ return {
+        "A": "马克思恩格斯创立的基本理论基本观点和学说的体系",
+        "B": "列宁主义",
+        "C": "xxx",
+        "D": "yyy"
+    }},
+    answer: "B",
+    userAnswer:"C",
+    chooseRight:false
+});
+
+const $emits = defineEmits(["update:modelValue"]);
+
+const showAnswer = ref<boolean>(false);
+const c_userAnswer = ref<string>("")
+
+const judg = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    showAnswer.value = true;
+    c_userAnswer.value = target.value;
+    $emits("update:modelValue", c_userAnswer.value);
+
 }
 
 </script>
 
 <style lang="scss" scoped>
-.QuestionsShow-container{
+.QuestionsShow-container {
     width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+   
+    
+   
     display: flex;
     flex-direction: column;
     justify-content: center;
     /* min-width: 600px; */
     min-width: 420px;
     height: 100%;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    .question {
+        font-size: 18px;
+    }
 }
 
 .options {
