@@ -11,5 +11,10 @@ export const routes = [
         path:"/login" ,
         component: ()=> import('../view/HomePage.vue'),
         name:"login"
+    },
+    {
+        path:"/show/:function" ,
+        component: ()=> import('../view/corePart.vue'),
+        name:"start"
     }
 ]

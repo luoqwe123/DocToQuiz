@@ -1,0 +1,191 @@
+<template>
+    <div class="Convert-container" v-if="convertShow">
+        <div :class="isMobilePhone?'mbMask':'mask'" @click="closeConvert"></div>
+        <div :class="{'box':true, 'mbBox':isMobilePhone}">
+            <h1>Upload a Document</h1>
+            <div class="inputRegion">
+                <input type="file" class="fileInput" ref="fileInputRef" accept=".pdf" required>
+                <button type="button" class="selectBtn" @click="selectPdf">选择文件</button>
+                <div style="font-size: 12px;text-align: center;">{{targetFile.info?targetFile.info.name:'未选择任何文件'}}</div>
+            </div>
+
+            <button type="button" class="convertButton" @click="convert">Convert</button>
+        </div>
+
+    </div>
+</template>
+
+<script setup lang='ts'>
+
+import { onMounted, ref } from 'vue';
+import { useScreenSize } from '@/hooks/useScreenSize';
+
+
+const convertShow = ref<boolean>(true);
+const { isMobilePhone } = useScreenSize();
+// import   pdf   from "pdf-parse";
+// import fs from "fs";
+
+interface targetFile{
+    info:File|null,
+    path:string
+}
+
+
+
+const fileInputRef = ref<HTMLInputElement|null>(null);
+const targetFile = ref<targetFile>({info:null,path:""});
+
+const closeConvert = ()=>{
+    if(isMobilePhone.value){
+        convertShow.value =false;
+    }
+}
+
+function selectPdf(){
+    if(fileInputRef.value){
+        fileInputRef.value.click();
+    }
+}
+function checkFile(event:Event){
+    console.log(event.target)
+    //targetFile.value!.path
+    targetFile.value!.info = (event.target as HTMLInputElement).files![0];
+    //console.log(targetFile.value)
+}
+
+async function convert(){
+    if(targetFile.value){
+        // const dataBuffer =  fs.readFileSync(targetFile.value.path);
+        // const strs = await pdf(dataBuffer as Buffer);
+        // console.log(strs)
+    }
+}
+onMounted(()=>{
+    if(fileInputRef.value){
+        fileInputRef.value.addEventListener("change",checkFile);
+    }
+    
+})
+
+
+</script>
+
+<style lang="scss" scoped>
+.Convert-container {
+    width: 100%;
+    height: 100%;
+    // position: relative;
+    
+    .mask{
+        width: 0px;
+        height: 0px;
+    }
+    .mbMask{
+        width: 100%;
+        height: 120%;
+        background-color: black;
+        opacity: .6;
+        position: absolute;
+        top: -2%;
+        z-index: 2;
+
+    }
+}
+
+.box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2% 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    gap: 12px;
+}
+.mbBox{
+    height: 75% !important;
+    position: absolute;
+    top: 25%;
+    z-index: 3;
+    border-radius:0px !important;
+    animation: move .4s ease-in;
+}
+@keyframes move {
+    0%{
+        top: 100%;
+    }
+    100%{
+        top: 25%;
+    }
+}
+
+/* 标题样式 */
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+
+}
+
+/* 文件输入框样式 */
+.inputRegion {
+    width: 56%;
+    height: 40%;
+    border: 2px dashed var(--el-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    gap: 20px;
+    .selectBtn{
+        height: 64%;
+        width: 200px;
+        background-color: #0057ff;
+        border: none;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+
+    }
+}
+.fileInput{
+    display: none !important;
+}
+
+/* 转换按钮样式 */
+.convertButton {
+    background-color: #67c23a;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+    vertical-align: center;
+    min-width: 78px;
+    min-height: 45px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 20%;
+    height: 25%;
+}
+
+/* 按钮悬停和点击效果 */
+.convertButton:hover {
+    // background-color: #357abd;
+    transform: translateY(-1px);
+}
+
+.convertButton:active {
+    transform: translateY(0);
+}
+
+/* 禁用按钮样式 */
+.convertButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+</style>

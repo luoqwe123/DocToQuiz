@@ -8,7 +8,7 @@
                 <h1 style="color: #3451b2;">DocToQuiz</h1>
                 <h1>一个将pdf题库转化为在线做题的网站，帮助你更高效的复习！</h1>
                 <p style="font-size: clamp(18px,1.4rem,24px);color: #3C3C43C7;">A website that converts PDF question banks into online questions to help you revise more efficiently!</p>
-                <button type="button" class="start">开始使用</button>
+                <button type="button" class="start" @click="goStart">开始使用</button>
             </div>
             <div class="content">
                 <ExampleCom style="width: 220px;height: 120px;"></ExampleCom>
@@ -20,6 +20,18 @@
 
 <script setup lang='ts'>
 
+import { useRouter } from 'vue-router';
+
+const router= useRouter();
+
+const goStart = ()=>{
+    router.push({
+        name:"start",
+        params:{
+            function:"start"
+        }
+    })
+}
 
 
 </script>

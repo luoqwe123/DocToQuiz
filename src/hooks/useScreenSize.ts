@@ -10,9 +10,11 @@ export function useScreenSize() {
         screenWidth.value = window.innerWidth;  
         screenHeight.value = window.innerHeight;
         isMobilePhone.value = screenWidth.value <= 768;
+        
     }
 
     onMounted(() => {
+        checkScreen();
         window.addEventListener('resize', checkScreen);
     })
     onUnmounted(()=>{

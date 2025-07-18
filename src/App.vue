@@ -10,7 +10,11 @@ import { RouterView } from 'vue-router';
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
+.App-container{
+    width: 100%;
+    height: 100vh;
+}
 
 </style>

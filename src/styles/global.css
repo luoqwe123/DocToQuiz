@@ -2,3 +2,33 @@
     margin: 0;
     padding: 0;
 }
+
+.toCenter{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+li{
+    list-style: none;
+}
+.correct {
+    color: #28a745;
+    font-weight: bold;
+    border-color: #28a745;
+    background-color: #e6f4ea;
+}
+
+.incorrect {
+    color: #dc3545;
+    font-weight: bold;
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.active {
+    color: #4a90e2;
+    /* 复选框激活时的颜色 */
+    border-color: #4a90e2;
+    background-color: #e7f0fa;
+}
