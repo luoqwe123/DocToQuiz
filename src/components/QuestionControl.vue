@@ -2,13 +2,33 @@
     <div class="Control-container">
         <button type="button" class="saveNote">保存做题记录</button>
         <button type="button" class="cleanNote">清除做题记录</button>
-        <button type="button" class="convert">转化</button>
+        <button type="button" class="convert" v-if="isMobilePhone" @click="showConvert">转化</button>
+        <button type="button" class="questionList" v-if="isMobilePhone" @click="showQueList">题列表</button>
         <button type="button" class="note">错题本</button>
-        <button type="button" class="homePage">首页</button>
+        <button type="button" class="homePage" @click="goHome">首页</button>
     </div>
 </template>
 
 <script setup lang='ts'>
+import { useScreenSize } from '@/hooks/useScreenSize';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const { isMobilePhone } = useScreenSize();
+
+const emits = defineEmits(["showConvert","showQueList"])
+
+function goHome() {
+    router.push({ path: "/" });
+}
+
+function showConvert() {
+    emits("showConvert",)
+}
+function showQueList(){
+    emits("showQueList")
+}
 
 </script>
 
@@ -21,13 +41,14 @@
     align-items: center;
     background-color: #fff;
     border-radius: 8px;
-    gap: 5%;
+    gap: 2%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     padding: 0 1%;
 
     button {
         height: 48%;
+        min-height: 42px;
         // background-color: #4a90e2;
         flex: 1;
         color: #fff;
@@ -65,6 +86,15 @@
 
     .convert:hover {
         background-color: #157347;
+        /* 加深绿色 */
+    }
+
+    .questionList {
+        background-color: #3dd67d;
+    }
+
+    .questionList:hover {
+        background-color: #2fc26d;
         /* 加深绿色 */
     }
 

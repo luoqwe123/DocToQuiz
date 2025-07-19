@@ -1,27 +1,25 @@
 <template>
     <div class="corePart-container">
-        <div :class="isMobilePhone ? 'mbHearder' : 'hearder'" ref="headerRef">
-            <QuestionCover />
+        <div :class="isMobilePhone ? 'mbHearder' : 'hearder'" ref="headerRef" v-if="convertShow || !isMobilePhone">
+            <QuestionCover @changeConvertStatus="closeConvert" />
         </div>
-        <div class="middle">
-            <div class="questionPart">
-                <QuestionShow class="questionShow" v-model="userAnswer" :question="currentQuestion.question"
+        <div :class="{ middle: true, 'pc-middle': !isMobilePhone, 'mb-middle': isMobilePhone }">
+            <div :class="{ questionPart: true, 'pc-questionPart': !isMobilePhone, 'mb-questionPart': isMobilePhone }">
+                <QuestionShow class="questionShow" @deliverAnswer="judgAnswer" :question="currentQuestion.question"
                     :select="currentQuestion.select" :answer="currentQuestion.answer"
-                    :userAnswer="currentQuestion.userAnswer" :chooseRight="currentQuestion.chooseRight"></QuestionShow>
+                    :userAnswer="currentQuestion.userAnswer" :chooseRight="currentQuestion.chooseRight"
+                    :id="currentQuestion.id"></QuestionShow>
                 <div class="switchBtn">
                     <button type="button" class="prev-btn" @click="prevQuestion">&lt;</button>
                     <button type="button" class="next-btn" @click="nextQuestion">&gt;</button>
                 </div>
             </div>
-
-            <div class="navPart">
-                <div style="font-size: 18px;font-weight: bold;margin-bottom: 8px;">题目导航</div>
-                <QuestionNav class="questionNav" :chapter="chapter" :locate="currentQuestion.questionNum"
-                    v-model="currentQuestion" />
+            <div :class="isMobilePhone ? 'mbnavPart' : 'navPart'" v-if="queListShow || !isMobilePhone">
+                <QuestionNav :data="data" class="questionNav" :currentQuestion="currentQuestion" @changeQuelistStatus="closeList" />
             </div>
         </div>
-        <div class="floor">
-            <QuestionControl />
+        <div :class="isMobilePhone ? 'mbFloor' : 'floor'">
+            <QuestionControl @showConvert="toShowConvert()" @showQueList="toShowQueList()" />
         </div>
     </div>
 
@@ -30,16 +28,16 @@
 <script setup lang='ts'>
 
 import { useScreenSize } from '@/hooks/useScreenSize';
-import { onMounted, ref, watchEffect } from 'vue';
+import { onMounted, provide, ref, watchEffect } from 'vue';
 const { isMobilePhone } = useScreenSize();
 const headerRef = ref<HTMLElement | null>(null)
 
-let data = [{
+let data = ref([{
     name: "daolun",
     content: {
         Achoice: [
             {
-                "id": "dqxxx",
+                "id": "dq0001",
                 "questionNum": "1-1-1",
                 "question": "1、狭义的马克思主义是指：（  ）",
                 "select":
@@ -52,14 +50,14 @@ let data = [{
                 "answer": "A",
                 "type": "单选",
                 "chooseRight": false,
-                "userAnswer": "C"
+                "userAnswer": ""
             },
         ],
         ManyChoice: [
             {
-                "id": "dqxxx",
+                "id": "dq0002",
                 "questionNum": "1-2-1",
-                "question": "1、狭义的马克思主义是指：（  ）",
+                "question": "1、广义的马克思主义是指：（  ）",
                 "select":
                 {
                     "A": "马克思恩格斯创立的基本",
@@ -75,27 +73,45 @@ let data = [{
             },
         ]
     }
-}]
-
-let chapter = data[0];
-
-let currentQuestion = ref(chapter.content.Achoice[0])
-
+}])
+interface QuestionInfo {
+    "id": string,
+    "questionNum": string,
+    "question": string,
+    "select":
+    {
+        "A": string,
+        "B": string,
+        "C": string,
+        "D": string
+    },
+    "answer": string,
+    "type": string,
+    "chooseRight": boolean,
+    "userAnswer": string
+}
+const convertShow = ref<boolean>(true);
+const queListShow = ref<boolean>(true);
+let currentQuestion = ref(data.value[0].content.Achoice[0]);
+function updateCurrentQuestion (newQuestion:QuestionInfo){
+    
+    currentQuestion.value = newQuestion;
+}
+provide<(question: QuestionInfo) => void>("updateCurrentQuestion",updateCurrentQuestion);
 function prevQuestion() {
     let [titleNum, typeNum, num] = currentQuestion.value.questionNum.split('-').map(Number);
 
     const type = typeNum <= 1 ? "Achoice" : "ManyChoice";
-    const thisModule = (data[titleNum - 1] as any).content[type];
+    const thisModule = (data.value[titleNum - 1] as any).content[type];
     if (num == 1) {
         if (type == "Achoice") {
             if (titleNum <= 1) return;
             titleNum--;
         }
         const endType = type == "Achoice" ? "ManyChoice" : "Achoice";
-        const res = (data[titleNum - 1] as any).content[endType];
+        const res = (data.value[titleNum - 1] as any).content[endType];
         num = res.length;
         currentQuestion.value = res[num - 1];
-
     } else {
         num--;
         currentQuestion.value = thisModule[num - 1];
@@ -106,28 +122,61 @@ function nextQuestion() {
     let [titleNum, typeNum, num] = currentQuestion.value.questionNum.split('-').map(Number);
 
     const type = typeNum <= 1 ? "Achoice" : "ManyChoice";
-    const thisModule = (data[titleNum - 1] as any).content[type];
+    const thisModule = (data.value[titleNum - 1] as any).content[type];
     if (thisModule.length == num) {
         if (type == "ManyChoice") {
-            if (titleNum >= data.length) return;
+            if (titleNum >= data.value.length) return;
             titleNum++;
         }
         const endType = type == "Achoice" ? "ManyChoice" : "Achoice";
-        const res = (data[titleNum - 1] as any).content[endType];
+        const res = (data.value[titleNum - 1] as any).content[endType];
         num = res.length;
         currentQuestion.value = res[num - 1];
-
+        console.log(currentQuestion.value)
 
     } else {
         num++;
         currentQuestion.value = thisModule[num - 1];
     }
 }
-let userAnswer = ref<string>("")
+function judgAnswer(answer: string, isRight: boolean) {
+    let [titleNum, typeNum, num] = currentQuestion.value.questionNum.split('-').map(Number);
 
+    const type = typeNum <= 1 ? "Achoice" : "ManyChoice";
+    const thisQuestion = (data.value[titleNum - 1] as any).content[type][num - 1];
+
+    thisQuestion.userAnswer = answer;
+    thisQuestion.chooseRight = isRight;
+
+    if (isRight) setTimeout(() => {
+        nextQuestion();
+    }, 300)
+
+}
+
+function toShowConvert() {
+    convertShow.value = true;
+}
+function toShowQueList() {
+    queListShow.value = true;
+}
 watchEffect(() => {
-    console.log(userAnswer.value)
+    if (isMobilePhone.value) {
+        convertShow.value = false;
+        queListShow.value = false;
+    } else {
+        convertShow.value = true;
+        queListShow.value = true;
+    }
 })
+
+function closeConvert(status: boolean) {
+    convertShow.value = status;
+}
+function closeList(status: boolean) {
+    queListShow.value = status;
+}
+provide<(status: boolean) => void>("closeList",closeList);
 onMounted(() => {
 
 })
@@ -145,10 +194,10 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     box-sizing: border-box;
-    justify-content: space-around;
-    padding: 2% 0%;
+    // justify-content: space-around;
+    padding: 3% 0%;
     overflow: hidden;
-    // gap: 5%;
+    gap: 2%;
     position: relative;
 
     .hearder {
@@ -166,18 +215,35 @@ onMounted(() => {
 
     }
 
-    .middle {
+    .pc-middle {
         width: 80%;
         height: 50vh;
         min-width: 420px;
         max-width: 1000px;
+    }
+
+    .mb-middle {
+        width: 100%;
+        height: 86vh;
+    }
+
+    .middle {
+
         display: flex;
         justify-content: space-between;
 
-        .questionPart {
-            box-sizing: border-box;
+        .pc-questionPart {
             width: 66%;
             height: 100%;
+        }
+
+        .mb-questionPart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .questionPart {
+            box-sizing: border-box;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -224,18 +290,17 @@ onMounted(() => {
             }
         }
 
-
         .navPart {
-            background-color: #fff;
-            box-sizing: border-box;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow-y: scroll;
             width: 30%;
             min-width: 240px;
             height: 100%;
-            overflow-y: auto;
+        }
+
+        .mbnavPart {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            z-index: 4;
         }
 
         // background-color: black;
@@ -247,6 +312,14 @@ onMounted(() => {
         min-width: 420px;
         max-width: 1000px;
         background-color: pink;
+    }
+
+    .mbFloor {
+        width: 100%;
+        height: 10vh;
+        position: fixed;
+        bottom: 0px;
+
     }
 }
 </style>

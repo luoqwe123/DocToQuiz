@@ -1,5 +1,5 @@
 <template>
-    <div class="Convert-container" v-if="convertShow">
+    <div class="Convert-container" >
         <div :class="isMobilePhone?'mbMask':'mask'" @click="closeConvert"></div>
         <div :class="{'box':true, 'mbBox':isMobilePhone}">
             <h1>Upload a Document</h1>
@@ -17,11 +17,10 @@
 
 <script setup lang='ts'>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, } from 'vue';
 import { useScreenSize } from '@/hooks/useScreenSize';
 
 
-const convertShow = ref<boolean>(true);
 const { isMobilePhone } = useScreenSize();
 // import   pdf   from "pdf-parse";
 // import fs from "fs";
@@ -30,16 +29,17 @@ interface targetFile{
     info:File|null,
     path:string
 }
-
+const emits = defineEmits(["changeConvertStatus"])
 
 
 const fileInputRef = ref<HTMLInputElement|null>(null);
 const targetFile = ref<targetFile>({info:null,path:""});
 
+
+
+
 const closeConvert = ()=>{
-    if(isMobilePhone.value){
-        convertShow.value =false;
-    }
+    emits("changeConvertStatus",false);
 }
 
 function selectPdf(){
@@ -48,7 +48,7 @@ function selectPdf(){
     }
 }
 function checkFile(event:Event){
-    console.log(event.target)
+    //console.log(event.target)
     //targetFile.value!.path
     targetFile.value!.info = (event.target as HTMLInputElement).files![0];
     //console.log(targetFile.value)

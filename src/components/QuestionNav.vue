@@ -1,24 +1,18 @@
 <template>
-    <div class="Chapter-container">
-        <div class="subtitle" style="font-size: 15px;font-weight: bold;">{{ props.chapter.name }}</div>
-        <div class="question" v-for="(item, key) in props.chapter.content" :key="key">
-            <div style="font-size: 12px;font-weight: bold;">{{ key == "Achoice" ? '单选' : '多选' }}</div>
-            <ul class="question-list">
-                <li v-for="question in item" :class="{
-                    active:props.locate == question.questionNum,
-                    correct:question.chooseRight,
-                    incorrect: !question.chooseRight&&question.userAnswer
-                    }" 
-                    @click="chooseQuestion(question)"
-                    :key="question.id">{{ question.questionNum.split("-")[2] }}</li>
-            </ul>
-
+    <div class="QueNav-container">
+        <div :class="isMobilePhone ? 'mbMask' : 'mask'" @click="closeList"></div>
+        <div :class="{ 'box': true, 'mbBox': isMobilePhone }">
+            <div style="font-size: 18px;font-weight: bold;margin-bottom: 8px;">题目导航</div>
+            <QuestionChapter v-for="(item, key) in props.data" :key="key" class="questionNav" :chapter="item"
+                :locate="currentQuestion.questionNum" />
         </div>
     </div>
 </template>
 
 <script setup lang='ts'>
-import { defineEmits } from 'vue'
+
+import { useScreenSize } from '@/hooks/useScreenSize';
+
 
 interface Chapter {
     name: string,
@@ -44,119 +38,81 @@ interface QuestionInfo {
     "chooseRight": boolean,
     "userAnswer": string
 }
-
 const props = withDefaults(defineProps<{
-    chapter: Chapter,
-    locate:string
-
+    data: Chapter[],
+    currentQuestion: QuestionInfo
 }>(), {
-    chapter: () => {
-        return {
-            name: "daolun",
-            content: {
-                Achoice: [
-                    {
-                        "id": "dqxxx",
-                        "questionNum": "1-1-1",
-                        "question": "1、狭义的马克思主义是指：（  ）",
-                        "select":
-                        {
-                            "A": "马克思恩格斯创立的基本理论基本观点和学说的体系",
-                            "B": "列宁主义",
-                            "C":"xxx",
-                            "D":"yyy"
-                        },
-                        "answer": "A",
-                        "type": "单选",
-                        "chooseRight": false,
-                        "userAnswer": "C"
-                    },
-                ],
-                ManyChoice: [
-                    {
-                        "id": "dqxxx",
-                        "questionNum": "1-2-1",
-                        "question": "1、狭义的马克思主义是指：（  ）",
-                        "select":
-                        {
-                            "A": "马克思恩格斯创立的基本理论基本观点和学说的体系",
-                            "B": "列宁主义",
-                            "C":"xxx",
-                            "D":"yyy"
-                        },
-                        "answer": "AB",
-                        "type": "多选",
-                        "chooseRight": false,
-                        "userAnswer": ""
 
-                    },
-                ]
-            }
-        }
-    },
-    locate:"1-1-1"
 })
 
+const emits = defineEmits(["changeQuelistStatus"])
 
 
-const emits = defineEmits(["update:modelValue"]);
-
-function chooseQuestion(question:QuestionInfo){
-    console.log(question)
-    emits("update:modelValue",question)
+function closeList() {
+    emits("changeQuelistStatus", false);
 }
+
+const {isMobilePhone} = useScreenSize();
+
 
 </script>
 
 <style lang="scss" scoped>
-.Chapter-container {
+.QueNav-container {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    .question-list {
-        list-style: none;
+
+
+    .mask {
+        width: 0px;
+        height: 0px;
     }
 
-    .question-list li {
-        display: flex;
-        width: 28px;
-        height: 28px;
-        color: #636363;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 50%;
-        margin: 5px;
-        cursor: pointer;
+    .mbMask {
+        width: 100%;
+        height: 120%;
+        background-color: black;
+        opacity: .6;
+        position: absolute;
+        top: -2%;
+        z-index: 2;
+
+    }
+}
+
+.box {
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: scroll;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.pcbox {
+
+    min-width: 240px;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.mbBox {
+    height: 75%;
+    position: absolute;
+    top: 25%;
+    z-index: 3;
+    border-radius: 0px;
+    animation: move .4s ease-in;
+}
+
+@keyframes move {
+    0% {
+        top: 100%;
     }
 
-    .question-list li.correct {
-        background-color: #28a745;
-        color: #fff;
-        border-color: #28a745;
+    100% {
+        top: 25%;
     }
-
-    .question-list li.incorrect {
-        background-color: #dc3545;
-        color: #fff;
-        border-color: #dc3545;
-    }
-
-    .question-list li.active {
-        background-color: #4a90e2;
-
-        border-color: #4a90e2;
-        color: #fff;
-    }
-
-    .question-list li:hover {
-        background-color: #e0e0e0;
-    }
-
-
 }
 </style>

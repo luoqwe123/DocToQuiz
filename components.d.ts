@@ -13,6 +13,7 @@ declare module 'vue' {
     ExampleCom: typeof import('./src/components/ExampleCom.vue')['default']
     Hearder: typeof import('./src/components/Layout/vueHearder.vue')['default']
     Layout: typeof import('./src/components/Layout/vueLayout.vue')['default']
+    QuestionChapter: typeof import('./src/components/QuestionChapter.vue')['default']
     QuestionControl: typeof import('./src/components/QuestionControl.vue')['default']
     QuestionCover: typeof import('./src/components/QuestionCover.vue')['default']
     QuestionNav: typeof import('./src/components/QuestionNav.vue')['default']
