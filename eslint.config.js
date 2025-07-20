@@ -8,7 +8,8 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
    {
     ignores: [
-      "package.json"
+      "package.json",
+      "**/dist/**"
     ], // 忽略 abc 文件夹及其子目录下的所有文件
   },
   { files: ["src/*.{js,mjs,cjs,ts,vue}"], plugins: { js }, extends: ["js/recommended"] },

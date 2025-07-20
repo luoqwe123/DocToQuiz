@@ -8,9 +8,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite --open",
     "lint": "eslint .",
+    "lint:all":"pnpm -r lint",
     "fix": "eslint --fix",
     "prepare": "husky",
-    "lint:lint-staged": "lint-staged"
+    "lint:lint-staged": "lint-staged",
+    "dev:server": "pnpm --filter server start:dev"
   },
   "keywords": [],
   "author": "",
