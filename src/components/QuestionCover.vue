@@ -3,13 +3,13 @@
         <div :class="isMobilePhone?'mbMask':'mask'" @click="closeConvert"></div>
         <div :class="{'box':true, 'mbBox':isMobilePhone}">
             <h1>Upload a Document</h1>
-            <div class="inputRegion">
+            <div :class="{'inputRegion':true,'pc-inputRegion':!isMobilePhone,'mb-inputRegion':isMobilePhone}">
                 <input type="file" class="fileInput" ref="fileInputRef" accept=".pdf" required>
                 <button type="button" class="selectBtn" @click="selectPdf">选择文件</button>
                 <div style="font-size: 12px;text-align: center;">{{targetFile.info?targetFile.info.name:'未选择任何文件'}}</div>
             </div>
 
-            <button type="button" class="convertButton" @click="convert">Convert</button>
+            <button type="button" :class="{'convertButton':true,'pc-convertButton':!isMobilePhone,'mb-convertButton':isMobilePhone}" @click="convert">Convert</button>
         </div>
 
     </div>
@@ -19,7 +19,6 @@
 
 import { onMounted, ref, } from 'vue';
 import { useScreenSize } from '@/hooks/useScreenSize';
-
 
 const { isMobilePhone } = useScreenSize();
 // import   pdf   from "pdf-parse";
@@ -31,11 +30,8 @@ interface targetFile{
 }
 const emits = defineEmits(["changeConvertStatus"])
 
-
 const fileInputRef = ref<HTMLInputElement|null>(null);
 const targetFile = ref<targetFile>({info:null,path:""});
-
-
 
 
 const closeConvert = ()=>{
@@ -132,10 +128,18 @@ h1 {
 
 }
 
+.mb-inputRegion{
+    width: 88%;
+    height: 40%;
+}
+.pc-inputRegion{
+    width: 56%;
+    height: 42%;
+}
+
 /* 文件输入框样式 */
 .inputRegion {
-    width: 56%;
-    height: 40%;
+   
     border: 2px dashed var(--el-border-color);
     display: flex;
     align-items: center;
@@ -157,6 +161,17 @@ h1 {
     display: none !important;
 }
 
+.mb-convertButton{
+    width: 50%;
+    height: 16%;
+}
+.pc-convertButton{
+    min-width: 78px;
+    min-height: 45px;
+    width: 20%;
+    height: 25%;
+}
+
 /* 转换按钮样式 */
 .convertButton {
     background-color: #67c23a;
@@ -164,14 +179,11 @@ h1 {
     font-size: 16px;
     font-weight: 500;
     vertical-align: center;
-    min-width: 78px;
-    min-height: 45px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 20%;
-    height: 25%;
+   
 }
 
 /* 按钮悬停和点击效果 */

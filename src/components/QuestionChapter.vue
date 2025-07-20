@@ -19,31 +19,8 @@
 
 <script setup lang='ts'>
 import { inject } from 'vue'
+import  type {  QuestionInfo,Chapter } from '@/types/forQuestion';
 
-interface Chapter {
-    name: string,
-    content: Content
-
-
-}
-interface Content {
-    Achoice: QuestionInfo[],
-    ManyChoice: QuestionInfo[]
-}
-interface QuestionInfo {
-    "id": string,
-    "questionNum": string,
-    "question": string,
-    "select":
-    {
-        "A": string,
-        "B": string
-    },
-    "answer": string,
-    "type": string,
-    "chooseRight": boolean,
-    "userAnswer": string
-}
 
 const props = withDefaults(defineProps<{
     chapter: Chapter,

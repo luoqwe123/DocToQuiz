@@ -29,6 +29,7 @@
 
 import { useScreenSize } from '@/hooks/useScreenSize';
 import { onMounted, provide, ref, watchEffect } from 'vue';
+import  type {  QuestionInfo } from '@/types/forQuestion';
 const { isMobilePhone } = useScreenSize();
 const headerRef = ref<HTMLElement | null>(null)
 
@@ -74,22 +75,7 @@ let data = ref([{
         ]
     }
 }])
-interface QuestionInfo {
-    "id": string,
-    "questionNum": string,
-    "question": string,
-    "select":
-    {
-        "A": string,
-        "B": string,
-        "C": string,
-        "D": string
-    },
-    "answer": string,
-    "type": string,
-    "chooseRight": boolean,
-    "userAnswer": string
-}
+
 const convertShow = ref<boolean>(true);
 const queListShow = ref<boolean>(true);
 let currentQuestion = ref(data.value[0].content.Achoice[0]);

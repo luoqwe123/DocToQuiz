@@ -1,7 +1,7 @@
 <template>
     <div class="QueNav-container">
         <div :class="isMobilePhone ? 'mbMask' : 'mask'" @click="closeList"></div>
-        <div :class="{ 'box': true, 'mbBox': isMobilePhone }">
+        <div :class="{ 'box': true, 'mbBox': isMobilePhone,'pcBox':!isMobilePhone }">
             <div style="font-size: 18px;font-weight: bold;margin-bottom: 8px;">题目导航</div>
             <QuestionChapter v-for="(item, key) in props.data" :key="key" class="questionNav" :chapter="item"
                 :locate="currentQuestion.questionNum" />
@@ -12,32 +12,10 @@
 <script setup lang='ts'>
 
 import { useScreenSize } from '@/hooks/useScreenSize';
+import  type {  QuestionInfo,Chapter} from '@/types/forQuestion';
 
 
-interface Chapter {
-    name: string,
-    content: Content
 
-
-}
-interface Content {
-    Achoice: QuestionInfo[],
-    ManyChoice: QuestionInfo[]
-}
-interface QuestionInfo {
-    "id": string,
-    "questionNum": string,
-    "question": string,
-    "select":
-    {
-        "A": string,
-        "B": string
-    },
-    "answer": string,
-    "type": string,
-    "chooseRight": boolean,
-    "userAnswer": string
-}
 const props = withDefaults(defineProps<{
     data: Chapter[],
     currentQuestion: QuestionInfo
@@ -90,7 +68,7 @@ const {isMobilePhone} = useScreenSize();
     width: 100%;
 }
 
-.pcbox {
+.pcBox {
 
     min-width: 240px;
     height: 100%;
