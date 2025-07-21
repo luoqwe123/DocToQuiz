@@ -5,11 +5,13 @@ import pluginVue from "eslint-plugin-vue";
 import { defineConfig } from "eslint/config";
 
 
+
 export default defineConfig([
    {
     ignores: [
       "package.json",
-      "**/dist/**"
+      "**/dist/**",
+      "app/**"
     ], // 忽略 abc 文件夹及其子目录下的所有文件
   },
   { files: ["src/*.{js,mjs,cjs,ts,vue}"], plugins: { js }, extends: ["js/recommended"] },
@@ -21,6 +23,8 @@ export default defineConfig([
       semi: ["error", "always"], // 强制分号
       "no-console": ["error"], // 允许 .js 文件中使用 console
       "no-require": "off", // 允许使用 require
+      "no-any":"off",
+      "prefer-const":"off"
     },
   },
   tseslint.configs.recommended,
