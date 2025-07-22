@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite --open",
     "lint": "eslint .",
-    "lint:all":"pnpm -r lint",
+    "lint:all": "pnpm -r lint",
     "fix": "eslint --fix",
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",
@@ -38,6 +38,7 @@
   "dependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@vue/tsconfig": "^0.7.0",
+    "axios": "^1.10.0",
     "element-plus": "^2.10.4",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"

@@ -22,10 +22,12 @@ fi
 # 创建 x.module.ts 文件
 cat << EOF > "$folder_path/$module_name.module.ts"
 import { Module } from '@nestjs/common';
+import { ${capitalized_name}Controller } from './$module_name.controller';
+import { ${capitalized_name}Service } from './$module_name.service';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [${capitalized_name}Controller],
+  providers: [${capitalized_name}Service],
 })
 export class ${capitalized_name}Module {}
 EOF

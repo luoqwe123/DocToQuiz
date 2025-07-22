@@ -21,7 +21,6 @@ function setRem() {
 // 初次设置
 window.addEventListener("resize",setRem);
 
-
 const app = createApp(App);
 app.use(ElementPlus);
 app.use(router);

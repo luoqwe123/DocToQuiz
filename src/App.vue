@@ -1,7 +1,6 @@
 <template>
     <div class="App-container">
-        <div class="a" ></div>
-        <RouterView v-if="false"></RouterView>
+        <RouterView ></RouterView>
     </div>
 </template>
 

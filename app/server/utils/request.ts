@@ -22,7 +22,7 @@ export const fetchStream = async (questions: string) :Promise<{ code: number; da
                 ],
             },
         ],
-        model: "ep-20250211161731-n8lcb", //ep-20250207171255-vnrmt
+        model: "ep-20250207171255-vnrmt", // DOUbao1.5
         // stream: true, // 启用流式传输
         // max_tokens: 10000,
     };

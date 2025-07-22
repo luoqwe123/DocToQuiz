@@ -19,6 +19,7 @@
 
 import { onMounted, ref, } from 'vue';
 import { useScreenSize } from '@/hooks/useScreenSize';
+import { upload } from '@/utils/requestJson';
 
 const { isMobilePhone } = useScreenSize();
 // import   pdf   from "pdf-parse";
@@ -44,14 +45,14 @@ function selectPdf(){
     }
 }
 function checkFile(event:Event){
-    //console.log(event.target)
-    //targetFile.value!.path
     targetFile.value!.info = (event.target as HTMLInputElement).files![0];
-    //console.log(targetFile.value)
 }
 
 async function convert(){
     if(targetFile.value){
+        console.log(targetFile.value)
+        const res = await upload(targetFile.value.info!);
+        console.log(res.data)
         // const dataBuffer =  fs.readFileSync(targetFile.value.path);
         // const strs = await pdf(dataBuffer as Buffer);
         // console.log(strs)

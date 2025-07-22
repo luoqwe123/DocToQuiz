@@ -109,9 +109,9 @@ function deleteAnswer(text: string) {
     return { answers: res, cleanedText };
 }
 
-export async function pdfTostr() {
-    const filePath = path.join(__dirname, '../../public/test.pdf');
-    const dataBuffer = fs.readFileSync(filePath);
+export async function pdfTostr(buffer:Buffer) {
+    // const filePath = path.join(__dirname, '../../public/test.pdf');
+    const dataBuffer = buffer;
     const data = await pdf(dataBuffer);
     const text = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0).join("");
     const { answers, cleanedText } = deleteAnswer(text);
