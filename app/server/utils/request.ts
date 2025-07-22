@@ -3,7 +3,7 @@
 
 const promots = `帮我将这个字符串转化为json数据，要求忽略掉该字符串标题、页码，以${process.env.DATA_TEMPLATE}为转化的模板，只给我转化好的json数据，其他词不允许出现，这里面包含不是题目的东西（如目录）你需要过滤掉，题目部分为章节，选项类型（单选，多选），题目，选项，一般 章节名前面为空格后面接的是一、单选（或者多选）,特别注意你除了回复我转好的json以外，其他任何话都不要有`;
 
-export const fetchStream = async (questions: string) => {
+export const fetchStream = async (questions: string) :Promise<{ code: number; data: string; }> => {
     const url = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
     const apiKey = process.env.OPENAI_API_KEY;
     const payload = {
@@ -40,7 +40,7 @@ export const fetchStream = async (questions: string) => {
         // 发起 fetch 请求
         const response = await fetch(url, requestOptions);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return { code:500,data:"" };
         }
         // 检查是否支持 SSE（Content-Type 应为 text/event-stream）
         // if (!response.headers.get('content-type')?.includes('text/event-stream')) {
@@ -53,7 +53,7 @@ export const fetchStream = async (questions: string) => {
         //   const { done, value } = await reader.read();
 
         const res = await response.json();
-        return res.choices[0].message.content;
+        return { code:200, data:res.choices[0].message.content};
         //   // 解码流数据
         //   const chunk:any = decoder.decode(value);
         //   let res = JSON.parse(chunk);
@@ -90,6 +90,7 @@ export const fetchStream = async (questions: string) => {
         //   }
 
     } catch (error) {
+        return { code:500,data:"" }
         console.error('Fetch error:', error);
     }
 };
