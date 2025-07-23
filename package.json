@@ -13,6 +13,7 @@
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",
     "dev:server": "pnpm --filter server start:dev"
+     
   },
   "keywords": [],
   "author": "",

@@ -1,13 +1,14 @@
 
 
+
 const fs = require('fs');
 const path = require("path");
 const pdf = require('pdf-parse');
 
 
-interface ChunkType{
-    chunk:string,
-    endPosition:number
+interface ChunkType {
+    chunk: string,
+    endPosition: number
 }
 function processText(text: string, maxChunkSize: number): ChunkType[] {
     let position = 0; // 当前位置
@@ -56,65 +57,55 @@ function processText(text: string, maxChunkSize: number): ChunkType[] {
     return result;
 }
 
-function deleteAnswer(text: string) {
-    const res: any = [];
-    const answers: any = [];
-    let cleanedText = text;
+function deleteAnswer(textArr: string[]): { answers: string, cleanedText: string } {
     const marker = "参考答案";
-    while (cleanedText.indexOf(marker) !== -1) {
-        // Find the start index using "参考答案："
-        const startIdx = cleanedText.indexOf(marker);
-
-        if (startIdx === -1) {
-            return { answers, cleanedText };
+    const answerLines: string[] = [];
+    // let startIdx:number = -1;
+    // for (const marker of markers) {
+    //     startIdx = textArr.indexOf(marker);
+    //     if(startIdx > 0){
+    //         break;
+    //     }
+    // }
+    
+    answerLines.push(marker);
+    //  筛选出答案行（包含数字和选项A/B/C/D且没有中文字符的行）
+    let indexs:number[] = [];
+    for(let i =0;i<  textArr.length;){
+        const trimmedLine = textArr[i].trim(); 
+        if (/[\d]/.test(trimmedLine) && /[A-D]/.test(trimmedLine) && !/[\u4e00-\u9fa5]/.test(trimmedLine)) {
+            answerLines.push(trimmedLine);
+            textArr.splice(i,1)
+            continue;
         }
-        let answerIdx = startIdx;
-        for (let i = answerIdx; i < cleanedText.length; i++) {
-            if (cleanedText[i + 1] == " ") {
-                answerIdx = i + 1;
-                break;
-            }
+        if(trimmedLine.includes(marker)){
+            textArr.splice(i,1);
+            continue;
         }
-
-        let endIdx = startIdx + marker.length;
-        let foundLastAnswer = false;
-        for (let i = endIdx; i < cleanedText.length - 1; i++) {
-            // 通过中文字符进行比配最后一个答案的位置
-            if (/[\u4e00-\u9fa5]/.test(cleanedText[i + 1])) {
-                endIdx = i;
-                foundLastAnswer = true;
-                break;
-            }
-        }
-        if (!foundLastAnswer) {
-            endIdx = cleanedText.length;
-        }
-        const answerSection = cleanedText.substring(answerIdx, endIdx).trim();
-        const answerItems = answerSection.split(/\s+/);
-        for (const item of answerItems) {
-            const [num, ans] = item.split(".");
-            if (num && ans) {
-                const id = `dq${num.padStart(4, "0")}`;
-                const answer = ans;
-                const type = answer.length === 1 ? "Achoice" : "ManyChoice";
-
-                answers.push({ id, answer, type });
-            }
-        }
-        res.push(answers);
-        // Clean the text by removing the reference answer section
-        cleanedText = cleanedText.substring(0, startIdx) + cleanedText.substring(endIdx).trim();
+        i++;
+      
+        
     }
-
-    return { answers: res, cleanedText };
+    if (answerLines.length === 0) {
+        throw new Error("参考答案无答案");
+    }
+    return { answers: answerLines.join(" "), cleanedText:textArr.join(" ") };
 }
 
-export async function pdfTostr(buffer:Buffer) {
+export async function pdfTostr(buffer: Buffer) {
     // const filePath = path.join(__dirname, '../../public/test.pdf');
     const dataBuffer = buffer;
     const data = await pdf(dataBuffer);
-    const text = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0).join("");
+    
+    const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
+    // console.log(text)
+    
     const { answers, cleanedText } = deleteAnswer(text);
+    console.log(answers)
+    console.log("\n")
+    console.log(cleanedText)
+    throw new Error("aaa")
     const endTextArray = processText(cleanedText, 4000);
-    return { answers,questions:endTextArray };
+
+    return { answers, questions: endTextArray };
 }

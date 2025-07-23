@@ -1,46 +1,93 @@
+
 import { Process, Processor } from '@nestjs/bull';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Job } from 'bull';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { TaskEntity } from './result.entity';
+// import { InjectRepository } from '@nestjs/typeorm';
+// import { Repository } from 'typeorm';
+// import { ResultEntity } from './result.entity';
+import { pdfTostr } from 'utils/pdfTostr';
+import { fetchStream } from 'utils/request';
 
-@Processor('processing')
-export class TaskProcessor {
-  constructor(
-    @InjectRepository(TaskEntity)
-    private taskRepository: Repository<TaskEntity>,
-  ) {}
+interface TaskState {
+  taskId: string;
+  status: 'processing' | 'completed' | 'failed';
+  progress: number;
+  totalTasks: number;
+  result?: any;
+  currentStr?: string
+}
 
-  @Process()
-  async processTask(job: Job<{ taskId: string; filePath: string }>) {
-    const { taskId } = job.data;
-    const totalTasks = 5; // 假设总共有 5 个步骤
+// 内存中的任务状态存储
+const taskStates = new Map<string, TaskState>();
 
-    // 初始化任务
-    let task = new TaskEntity();
-    task.id = taskId;
-    task.status = 'processing';
-    task.progress = 0;
-    task.total_tasks = totalTasks;
-    await this.taskRepository.save(task);
 
-    // 模拟任务处理
-    const result = { data: [] as string[] }; // 最终数据结构
-    for (let i = 0; i < totalTasks; i++) {
-      // 模拟处理逻辑
-      result.data.push(`Step ${i + 1} completed`);
+export class UploadProcessor {
+  constructor(private readonly prisma: PrismaService) {}
 
-      // 更新进度
-      task.progress = i + 1;
-      await this.taskRepository.save(task);
+  async processPdf(data:{ taskId: string; file: Express.Multer.File }) {
+    const { taskId, file } = data;
+    // PDF 转换和 AI 处理
+    const { answers, questions } = await pdfTostr(file.buffer);
+    let res: string[] = [];
+    let i = 0;
+    // console.log(questions[0].chunk);
 
-      // 每分钟更新一次（模拟 1 分钟）
-      await new Promise((resolve) => setTimeout(resolve, 60000));
+    // 初始化任务状态
+    const task: TaskState = {
+      taskId,
+      status: 'processing', progress: 0, totalTasks: questions.length, currentStr: ""
+    };
+    taskStates.set(taskId, task);
+    console.log(questions.length +"\n")
+    try {
+      // for (i; i < 3||task.totalTasks; i++) {
+      //   console.log(i,questions[i])
+      //   const questionStr = questions[i].chunk;
+        //  AI 处理
+        // const { code, data } = await fetchStream(questionStr);
+        // if (code == 200) {
+        //   res.push(data)
+        //   // 更新进度
+        //   task.progress = i + 1;
+        //   taskStates.set(taskId, task);
+
+        //   // 每分钟更新一次
+        //   await new Promise((resolve) => setTimeout(resolve, 60000));
+        // }
+
+      // }
+
+      // 任务完成
+      task.status = 'completed';
+      task.result = res;
+      taskStates.set(taskId, task);
+
+      // 存储结果到 MySQL
+      // await this.resultRepository.save({ id: taskId, result:JSON.stringify(res) });
+    } catch (error) {
+      task.status = 'failed';
+      task.currentStr = questions[i].chunk;
+      taskStates.set(taskId, task);
     }
+  }
 
-    // 任务完成
-    task.status = 'completed';
-    task.result = result;
-    await this.taskRepository.save(task);
+  // 提供方法给 WebSocket 获取任务状态
+  static getTaskState(taskId: string): TaskState | undefined {
+    return taskStates.get(taskId);
+  }
+
+  // 清理任务状态
+  static clearTaskState(taskId: string) {
+    taskStates.delete(taskId);
+  }
+
+  // 你的 PDF 转换逻辑
+  private convertPdfToCharArray(filePath: string): string[] {
+    return Array(8).fill('mock-char'); // 替换为你的实现
+  }
+
+  // 你的 AI 处理逻辑
+  private processWithAI(char: string): any {
+    return { processed: char }; // 替换为你的实现
   }
 }

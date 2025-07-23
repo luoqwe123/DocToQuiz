@@ -10,9 +10,11 @@ export class PdfFileController {
 
   @Post("convert") @HttpCode(200)
   @UseInterceptors(FileInterceptor('file'))
-  convert(@UploadedFile() file: Express.Multer.File) {
+  async convert(@UploadedFile() file: Express.Multer.File) {
     const taskId = uuidv4();
-    return this.pdfFileService.getJson(taskId,file);
+    await this.pdfFileService.getJson(taskId,file);
+    console.log(taskId)
+    return { taskId };
   }
   @Get("he") @HttpCode(200)
   he(){

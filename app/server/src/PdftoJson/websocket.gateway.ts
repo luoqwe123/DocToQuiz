@@ -1,21 +1,14 @@
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws'; // Socket 替换为 WebSocket
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { TaskEntity } from './result.entity';
+import { Server, WebSocket } from 'ws'; 
+import { UploadProcessor } from './pdfFile.processor';
+
 
 @WebSocketGateway({ path: '/task' })
 export class TaskWebSocketGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    @InjectRepository(TaskEntity)
-    private taskRepository: Repository<TaskEntity>,
-  ) {}
-
-  handleConnection(client: WebSocket) {
-    // 从 client 中获取 URL 并解析任务 ID
+   handleConnection(client: WebSocket) {
     const url = client.url;
     const taskId = url?.split('/')[2];
     if (!taskId) {
@@ -23,22 +16,29 @@ export class TaskWebSocketGateway {
       return;
     }
 
-    // 每分钟检查任务状态并推送
-    const interval = setInterval(async () => {
-      const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    const interval = setInterval(() => {
+      const task = UploadProcessor.getTaskState(taskId);
       if (task) {
-        const data = {
-          taskId: task.id,
+        client.send(JSON.stringify({
+          taskId: task.taskId,
           status: task.status,
           progress: task.progress,
-          totalTasks: task.total_tasks,
+          totalTasks: task.totalTasks,
           result: task.result,
-        };
-        client.send(JSON.stringify(data));
-        if (task.status === 'completed') {
+        }));
+        if (task.status === 'completed' || task.status === 'failed') {
           clearInterval(interval);
+          UploadProcessor.clearTaskState(taskId); // 清理内存
           client.close();
         }
+      } else {
+        client.send(JSON.stringify({
+          taskId,
+          status: 'error',
+          error: 'Task not found',
+        }));
+        clearInterval(interval);
+        client.close();
       }
     }, 60000); // 每分钟推送一次
   }

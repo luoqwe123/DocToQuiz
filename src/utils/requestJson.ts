@@ -15,6 +15,7 @@ export async function upload(file: File): Promise<any> {
     try {
         const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}pdfFile/convert`, formData);
         taskId = response.data.taskId;
+        console.log(response)
         connectWebSocket(taskId!);
     } catch (err:any) {
         error = "failt";
