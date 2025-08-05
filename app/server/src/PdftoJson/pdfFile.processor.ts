@@ -40,22 +40,22 @@ export class UploadProcessor {
     taskStates.set(taskId, task);
     console.log(questions.length +"\n")
     try {
-      // for (i; i < 3||task.totalTasks; i++) {
-      //   console.log(i,questions[i])
-      //   const questionStr = questions[i].chunk;
+      for (i; i < 1; i++) { //task.totalTasks
+        console.log(i,questions[i])
+        const questionStr = questions[i].chunk;
         //  AI 处理
-        // const { code, data } = await fetchStream(questionStr);
-        // if (code == 200) {
-        //   res.push(data)
-        //   // 更新进度
-        //   task.progress = i + 1;
-        //   taskStates.set(taskId, task);
+        const { code, data } = await fetchStream(questionStr);
+        if (code == 200) {
+          res.push(data)
+          // 更新进度
+          task.progress = i + 1;
+          taskStates.set(taskId, task);
 
-        //   // 每分钟更新一次
-        //   await new Promise((resolve) => setTimeout(resolve, 60000));
-        // }
+          // 每分钟更新一次
+          await new Promise((resolve) => setTimeout(resolve, 60000));
+        }
 
-      // }
+      }
 
       // 任务完成
       task.status = 'completed';

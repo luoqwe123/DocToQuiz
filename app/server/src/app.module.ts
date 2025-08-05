@@ -11,8 +11,8 @@ import { TaskWebSocketGateway } from './PdftoJson/websocket.gateway';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    BullModule.forRoot({}), // 不使用 Redis，仅用于队列功能
-    BullModule.registerQueue({ name: 'processing' }),
+    // BullModule.forRoot({}), // 不使用 Redis，仅用于队列功能
+    // BullModule.registerQueue({ name: 'processing' }),
   ],
   providers:[TaskWebSocketGateway]
 })

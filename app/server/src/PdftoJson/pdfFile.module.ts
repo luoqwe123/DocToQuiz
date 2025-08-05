@@ -11,6 +11,6 @@ import { UploadProcessor } from './pdfFile.processor';
     PrismaModule,
   ],
   controllers: [PdfFileController],
-  providers: [PdfFileService,TaskWebSocketGateway,UploadProcessor],
+  providers: [PdfFileService,UploadProcessor],
 })
 export class PdfFileModule {}

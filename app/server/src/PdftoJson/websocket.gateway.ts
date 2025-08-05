@@ -1,17 +1,33 @@
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws'; 
+import { WebSocketGateway, WebSocketServer, OnGatewayConnection } from '@nestjs/websockets';
+import { Server, WebSocket } from 'ws';
 import { UploadProcessor } from './pdfFile.processor';
+import { Logger } from '@nestjs/common';
+import { IncomingMessage } from 'http';
 
+@WebSocketGateway({
+  path: '/api/task', cors: {
+    origin: '*',
+  },
 
-@WebSocketGateway({ path: '/task' })
-export class TaskWebSocketGateway {
+})
+export class TaskWebSocketGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
+  private readonly logger = new Logger(TaskWebSocketGateway.name);
+  constructor() {
+    this.logger.log('SimpleWebSocketGateway initialized');
+  }
+  handleConnection(client: WebSocket,request:IncomingMessage) {
 
-   handleConnection(client: WebSocket) {
-    const url = client.url;
-    const taskId = url?.split('/')[2];
+    this.logger.log('WebSocket client connected');
+    
+    const url = request.url;
+    const taskId = url?.split('=')[1];
+
+    this.logger.log(`WebSocket connected: url=${url}, taskId=${taskId}`);
+    console.log(url, taskId)
     if (!taskId) {
+      console.log(111)
       client.close();
       return;
     }
@@ -41,5 +57,7 @@ export class TaskWebSocketGateway {
         client.close();
       }
     }, 60000); // 每分钟推送一次
+
+
   }
 }

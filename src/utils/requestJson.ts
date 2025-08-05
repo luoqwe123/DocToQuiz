@@ -25,8 +25,9 @@ export async function upload(file: File): Promise<any> {
     //   loadingStore.setProgress(100);
 
     function connectWebSocket(taskId: string) {
-    ws = new WebSocket(`ws://localhost:3000/task/${taskId}`);
+    ws = new WebSocket(`ws://localhost:3001/api/task?taskId=${taskId}`);
     ws.onmessage = (event) => {
+      console.log(event.data)
       const data = JSON.parse(event.data);
       if (data.status === 'progress') {
         progress = data.progress;

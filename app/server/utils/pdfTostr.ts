@@ -95,17 +95,10 @@ function deleteAnswer(textArr: string[]): { answers: string, cleanedText: string
 export async function pdfTostr(buffer: Buffer) {
     // const filePath = path.join(__dirname, '../../public/test.pdf');
     const dataBuffer = buffer;
-    const data = await pdf(dataBuffer);
-    
-    const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
-    // console.log(text)
-    
+    const data = await pdf(dataBuffer);  
+    const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);   
     const { answers, cleanedText } = deleteAnswer(text);
-    console.log(answers)
-    console.log("\n")
-    console.log(cleanedText)
-    throw new Error("aaa")
     const endTextArray = processText(cleanedText, 4000);
-
+   
     return { answers, questions: endTextArray };
 }
