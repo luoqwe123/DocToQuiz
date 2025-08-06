@@ -57,48 +57,79 @@ function processText(text: string, maxChunkSize: number): ChunkType[] {
     return result;
 }
 
+
+function processAnswer(text: string, maxChunkSize: number) {
+    let position = 0; // 当前位置
+    const result: any = []; // 存储分块结果
+    let flag = false;
+    while (position < text.length) {
+        // 计算初步结束位置
+        let tentativeEnd = position + maxChunkSize;
+        if(flag) break
+        if (tentativeEnd > text.length) {
+            tentativeEnd = text.length; // 超出文本长度时调整为文本末尾
+            flag = true
+        }
+        // 提取当前分块
+        const substring = text.substring(position, tentativeEnd);
+        let i = substring.length - 1
+        if (!flag) {
+            while (!(/\d/.test(substring[i])&&/[a-dA-D]/.test(substring[i-1]))) {      
+                i--
+            }
+        }
+        // 提取分块内容
+        let chunk = substring.substring(0, i);
+        result.push({
+            chunk: chunk, // 分块内容
+            endPosition: position+i // 结束位置
+        });
+
+        // 更新位置为下一次筛选的起点
+        position += i;
+    }
+    console.log(result)
+    return result;
+}
+
 function deleteAnswer(textArr: string[]): { answers: string, cleanedText: string } {
     const marker = "参考答案";
     const answerLines: string[] = [];
-    // let startIdx:number = -1;
-    // for (const marker of markers) {
-    //     startIdx = textArr.indexOf(marker);
-    //     if(startIdx > 0){
-    //         break;
-    //     }
-    // }
-    
+
+
     answerLines.push(marker);
     //  筛选出答案行（包含数字和选项A/B/C/D且没有中文字符的行）
-    let indexs:number[] = [];
-    for(let i =0;i<  textArr.length;){
-        const trimmedLine = textArr[i].trim(); 
+    let indexs: number[] = [];
+    for (let i = 0; i < textArr.length;) {
+        const trimmedLine = textArr[i].trim();
         if (/[\d]/.test(trimmedLine) && /[A-D]/.test(trimmedLine) && !/[\u4e00-\u9fa5]/.test(trimmedLine)) {
             answerLines.push(trimmedLine);
-            textArr.splice(i,1)
+
+            textArr.splice(i, 1)
             continue;
         }
-        if(trimmedLine.includes(marker)){
-            textArr.splice(i,1);
+        if (trimmedLine.includes(marker)) {
+            textArr.splice(i, 1);
             continue;
         }
         i++;
-      
-        
+
+
     }
     if (answerLines.length === 0) {
         throw new Error("参考答案无答案");
     }
-    return { answers: answerLines.join(" "), cleanedText:textArr.join(" ") };
+    return { answers: answerLines.join(" "), cleanedText: textArr.join(" ") };
 }
 
 export async function pdfTostr(buffer: Buffer) {
     // const filePath = path.join(__dirname, '../../public/test.pdf');
     const dataBuffer = buffer;
-    const data = await pdf(dataBuffer);  
-    const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);   
+    const data = await pdf(dataBuffer);
+    const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
     const { answers, cleanedText } = deleteAnswer(text);
-    const endTextArray = processText(cleanedText, 4000);
-   
-    return { answers, questions: endTextArray };
+    let endAnswers = processAnswer(answers, 400)
+    const endTextArray = processText(cleanedText, 3600);
+
+    return { answers:endAnswers, questions: endTextArray };
 }

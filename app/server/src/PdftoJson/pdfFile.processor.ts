@@ -8,13 +8,15 @@ import { Job } from 'bull';
 import { pdfTostr } from 'utils/pdfTostr';
 import { fetchStream } from 'utils/request';
 
+
 interface TaskState {
   taskId: string;
   status: 'processing' | 'completed' | 'failed';
   progress: number;
   totalTasks: number;
   result?: any;
-  currentStr?: string
+  currentStr?: string,
+  error?:string
 }
 
 // 内存中的任务状态存储
@@ -40,23 +42,28 @@ export class UploadProcessor {
     taskStates.set(taskId, task);
     console.log(questions.length +"\n")
     try {
-      for (i; i < 1; i++) { //task.totalTasks
-        console.log(i,questions[i])
-        const questionStr = questions[i].chunk;
-        //  AI 处理
-        const { code, data } = await fetchStream(questionStr);
-        if (code == 200) {
-          res.push(data)
-          // 更新进度
-          task.progress = i + 1;
-          taskStates.set(taskId, task);
+      // console.log(answers[0].chunk)
+        const { code, data } = await fetchStream(answers[0].chunk,1);
+        console.log(data)
+      // for (i; i < 1; i++) { //task.totalTasks
+      //   console.log(i,questions[i])
+      //   const questionStr = questions[i].chunk;
+      //   //  AI 处理
+      //   const { code, data } = await fetchStream(questionStr);
+      //   if (code == 200) {
+      //     console.log(data)
+      //     console.log(JSON.parse(data))
+      //     res.push(...JSON.parse(data))
+      //     // 更新进度
+      //     task.progress = i + 1;
+      //     taskStates.set(taskId, task);
 
-          // 每分钟更新一次
-          await new Promise((resolve) => setTimeout(resolve, 60000));
-        }
+      //     // 每分钟更新一次
+      //     await new Promise((resolve) => setTimeout(resolve, 60000));
+      //   }
 
-      }
-
+      // }
+      console.log(res)
       // 任务完成
       task.status = 'completed';
       task.result = res;
@@ -65,7 +72,9 @@ export class UploadProcessor {
       // 存储结果到 MySQL
       // await this.resultRepository.save({ id: taskId, result:JSON.stringify(res) });
     } catch (error) {
+      //console.log(error)
       task.status = 'failed';
+      task.error = "token值设置过大，需要联系创造者修改";
       task.currentStr = questions[i].chunk;
       taskStates.set(taskId, task);
     }

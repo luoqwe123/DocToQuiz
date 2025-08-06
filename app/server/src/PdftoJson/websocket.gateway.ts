@@ -18,20 +18,14 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
     this.logger.log('SimpleWebSocketGateway initialized');
   }
   handleConnection(client: WebSocket,request:IncomingMessage) {
-
     this.logger.log('WebSocket client connected');
-    
     const url = request.url;
     const taskId = url?.split('=')[1];
-
     this.logger.log(`WebSocket connected: url=${url}, taskId=${taskId}`);
-    console.log(url, taskId)
     if (!taskId) {
-      console.log(111)
       client.close();
       return;
     }
-
     const interval = setInterval(() => {
       const task = UploadProcessor.getTaskState(taskId);
       if (task) {
