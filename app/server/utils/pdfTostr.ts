@@ -88,7 +88,6 @@ function processAnswer(text: string, maxChunkSize: number) {
         // 更新位置为下一次筛选的起点
         position += i;
     }
-    console.log(result)
     return result;
 }
 
@@ -129,7 +128,7 @@ export async function pdfTostr(buffer: Buffer) {
     const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
     const { answers, cleanedText } = deleteAnswer(text);
     let endAnswers = processAnswer(answers, 400)
-    const endTextArray = processText(cleanedText, 3600);
+    const endTextArray = processText(cleanedText, 3200);
 
     return { answers:endAnswers, questions: endTextArray };
 }
