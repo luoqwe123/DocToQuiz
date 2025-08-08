@@ -72,8 +72,9 @@ function processAnswer(text: string, maxChunkSize: number) {
         }
         // 提取当前分块
         const substring = text.substring(position, tentativeEnd);
-        let i = substring.length - 1
+        let i = substring.length;
         if (!flag) {
+            i--;
             while (!(/\d/.test(substring[i])&&/[a-dA-D]/.test(substring[i-1]))) {      
                 i--
             }
@@ -127,8 +128,7 @@ export async function pdfTostr(buffer: Buffer) {
     const data = await pdf(dataBuffer);
     const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
     const { answers, cleanedText } = deleteAnswer(text);
-    let endAnswers = processAnswer(answers, 400)
-    const endTextArray = processText(cleanedText, 3200);
-
+    let endAnswers = processAnswer(answers, 400);
+    const endTextArray = processText(cleanedText, 2800);
     return { answers:endAnswers, questions: endTextArray };
 }

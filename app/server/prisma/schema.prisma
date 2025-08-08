@@ -16,6 +16,6 @@ datasource db {
 
 model Jsonresults {
   id        String   @id @db.VarChar(255) // 对应 VARCHAR(255) 主键
-  result    Json? // JSON 类型，允许为 null
+  result    Json?    // JSON 类型，允许为 null
   createdAt DateTime @default(now())
 }

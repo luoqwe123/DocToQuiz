@@ -18,9 +18,9 @@ export class PdfFileService {
   async getJson(file: Express.Multer.File) {
     const taskId = uuidv4();
     console.log(taskId)
-    this.processor.processPdf({ taskId, file });
-   
+    this.processor.processPdf({ taskId, file },this.prisma);
     return {taskId};
     
   }
+  
 }

@@ -1,7 +1,6 @@
 
-import { Process, Processor } from '@nestjs/bull';
+
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Job } from 'bull';
 // import { InjectRepository } from '@nestjs/typeorm';
 // import { Repository } from 'typeorm';
 // import { ResultEntity } from './result.entity';
@@ -25,46 +24,45 @@ const taskStates = new Map<string, TaskState>();
 
 
 export class UploadProcessor {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor() { }
 
-  async processPdf(data: { taskId: string; file: Express.Multer.File }) {
+  async processPdf(data: { taskId: string; file: Express.Multer.File },prisma:PrismaService) {
     const { taskId, file } = data;
     // PDF 转换和 AI 处理
     const { answers, questions } = await pdfTostr(file.buffer);
     let res: Pdfdata[] = [];
     let answerRes: any = [];
-    let i = 0;
+    let i = -1;
     let id = 1;
     let ansIndex = 0;
+    let currAns:string = '';
     // console.log(questions[0].chunk);
 
     // 初始化任务状态
     const task: TaskState = {
       taskId,
-      status: 'processing', progress: 0, totalTasks: questions.length + answers.length, currentStr: ""
+      status: 'processing', progress: 0, totalTasks: questions.length + answers.length, currentStr: "",error:""
     };
     taskStates.set(taskId, task);
-    console.log(questions.length + "\n")
     try {
-      // console.log(answers[0].chunk)
-      // for(let i = 0;i<2;i++){
-      //   const { code, data } = await fetchStream(answers[i].chunk,1);
-      //   answerRes.push(...JSON.parse(data))
-      //   console.log(typeof JSON.parse(data))
-      // }
-
-
-      for (i = 1; i < 2; i++) { //task.totalTasks
-
+      currAns = answers[0].chunk;
+      console.log(answers.length)
+      for(let i = 0;i<answers.length;i++){
+        
+        const { code, data } = await fetchStream(answers[4].chunk,1);
+        console.log(data)
+        answerRes.push(...JSON.parse(data));
+        console.log(answerRes.length)
+        task.progress++;
+      }
+      for (i = 0; i < questions.length; i++) { 
         const questionStr = questions[i].chunk;
-        console.log(questionStr)
+        console.log(questionStr,questions[i].endPosition)
         //  AI 处理
-        console.log("\n")
         const { code, data } = await fetchStream(questionStr, 0);
         console.log(data)
         if (code == 200) {
           const targetData: Pdfdata[] = JSON.parse(data);
-          merge(targetData);
           for (const d of targetData) {
             let achoice = d.content.Achoice;
             let manyChoice = d.content.ManyChoice;
@@ -83,7 +81,7 @@ export class UploadProcessor {
           }
           res.push(...targetData);
           // 更新进度
-          task.progress = i + 1;
+          task.progress++;
           taskStates.set(taskId, task);
 
           // 每分钟更新一次
@@ -91,19 +89,27 @@ export class UploadProcessor {
         }
 
       }
-      console.log(res)
+      merge(res);
       // 任务完成
       task.status = 'completed';
       task.result = res;
       taskStates.set(taskId, task);
-
+      console.log(prisma)
       // 存储结果到 MySQL
-      // await this.resultRepository.save({ id: taskId, result:JSON.stringify(res) });
+      await prisma.jsonresults.create({
+        data:{ id: taskId, result:JSON.stringify(res) }
+      });
     } catch (error) {
-      //console.log(error)
+      console.log(error)
       task.status = 'failed';
-      task.error = "token值设置过大，需要联系创造者修改";
-      task.currentStr = questions[i].chunk;
+      task.error = "token值可能设置过大(需要联系创造者修改)";
+      console.log(i)
+      if(i===-1) {
+        task.currentStr = currAns;
+      } else{ 
+        task.currentStr = questions[i].chunk;
+      }
+      console.log(task)
       taskStates.set(taskId, task);
     }
   }
@@ -116,16 +122,6 @@ export class UploadProcessor {
   // 清理任务状态
   static clearTaskState(taskId: string) {
     taskStates.delete(taskId);
-  }
-
-  // 你的 PDF 转换逻辑
-  private convertPdfToCharArray(filePath: string): string[] {
-    return Array(8).fill('mock-char'); // 替换为你的实现
-  }
-
-  // 你的 AI 处理逻辑
-  private processWithAI(char: string): any {
-    return { processed: char }; // 替换为你的实现
   }
 }
 

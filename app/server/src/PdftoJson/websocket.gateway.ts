@@ -17,7 +17,7 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
   constructor() {
     this.logger.log('SimpleWebSocketGateway initialized');
   }
-  handleConnection(client: WebSocket,request:IncomingMessage) {
+  handleConnection(client: WebSocket, request: IncomingMessage) {
     this.logger.log('WebSocket client connected');
     const url = request.url;
     const taskId = url?.split('=')[1];
@@ -35,6 +35,8 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
           progress: task.progress,
           totalTasks: task.totalTasks,
           result: task.result,
+          currentStr: task.currentStr ? task.currentStr : "无错误不显示",
+          error: task.error ? task.error : "无错误",
         }));
         if (task.status === 'completed' || task.status === 'failed') {
           clearInterval(interval);
