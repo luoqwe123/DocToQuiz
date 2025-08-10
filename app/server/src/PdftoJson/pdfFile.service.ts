@@ -22,5 +22,40 @@ export class PdfFileService {
     return {taskId};
     
   }
-  
+  async getJsonData(id?:string){
+    if(!id){
+      return this.getAllId()
+    }
+    let data = await this.prisma.jsonresults.findUnique({
+      where:{
+        id
+      }
+    })
+    if(!data){
+      return { message:`找不到id为${id}的数据` };
+    }
+    return { data:data.result,id:data.id };
+  }
+  async getAllId(){
+    let data = await this.prisma.jsonresults.findMany({
+      orderBy: {
+        createdAt: 'desc', 
+      },
+    })
+    
+    return { data:data.map((item)=> item.id) };
+  }
+  async uploadJson(id:string,json:string){
+      await this.prisma.jsonresults.update({
+        where:{
+          id
+
+        },
+        data:{
+          result: json
+        }
+      })
+      return { message:"修改成功" };
+  }
+
 }

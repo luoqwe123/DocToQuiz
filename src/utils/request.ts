@@ -4,7 +4,7 @@ import axios from "axios";
 
 import { GET_TOKEN, } from "./token";
 
-const request  = axios.create({
+export const request  = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 5000
 })
@@ -26,4 +26,3 @@ request.interceptors.response.use((Response)=>{
    
     return Promise.reject(error)
 })
-export default request

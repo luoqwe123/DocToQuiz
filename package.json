@@ -44,7 +44,5 @@
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },
-  "lint-staged": {
-    "*.{vue,js,ts,jsx,tsx,md,json}": "eslint --fix"
-  }
+  
 }

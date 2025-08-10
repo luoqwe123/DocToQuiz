@@ -10,7 +10,7 @@
                     incorrect: !question.chooseRight&&question.userAnswer
                     }" 
                     @click="chooseQuestion(question)"
-                    :key="question.id">{{ question.questionNum.split("-")[2] }}</li>
+                    :key="question.id" :dataId="question.id" :dataAnswer="question.answer">{{ question.questionNum.split("-")[2] }}</li>
             </ul>
 
         </div>
@@ -19,7 +19,7 @@
 
 <script setup lang='ts'>
 import { inject } from 'vue'
-import  type {  QuestionInfo,Chapter } from '@/types/forQuestion';
+import  type {  ViewInfo,Chapter } from '@/types/forQuestion';
 
 
 const props = withDefaults(defineProps<{
@@ -74,10 +74,10 @@ const props = withDefaults(defineProps<{
     locate:"1-1-1"
 })
 
-const updateCurrentQuestion = inject<(question: QuestionInfo) => void>("updateCurrentQuestion")!;
+const updateCurrentQuestion = inject<(question: ViewInfo) => void>("updateCurrentQuestion")!;
 const clostList = inject<(status: boolean) => void>("closeList")!;
 
-function chooseQuestion(question:QuestionInfo){
+function chooseQuestion(question:ViewInfo){
     // console.log(question)
     updateCurrentQuestion(question);
     clostList(false);
@@ -94,6 +94,8 @@ function chooseQuestion(question:QuestionInfo){
     gap: 5px;
     .question-list {
         list-style: none;
+        display: flex;
+        flex-wrap: wrap;
     }
 
     .question-list li {

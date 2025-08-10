@@ -4,7 +4,7 @@
         <div :class="{ 'box': true, 'mbBox': isMobilePhone,'pcBox':!isMobilePhone }">
             <div style="font-size: 18px;font-weight: bold;margin-bottom: 8px;">题目导航</div>
             <QuestionChapter v-for="(item, key) in props.data" :key="key" class="questionNav" :chapter="item"
-                :locate="currentQuestion.questionNum" />
+                :locate="currentQuestion.questionNum" style="height: auto;" />
         </div>
     </div>
 </template>
@@ -12,7 +12,7 @@
 <script setup lang='ts'>
 
 import { useScreenSize } from '@/hooks/useScreenSize';
-import  type {  QuestionInfo,Chapter} from '@/types/forQuestion';
+import  type { ViewInfo as QuestionInfo,Chapter} from '@/types/forQuestion';
 
 
 
@@ -64,7 +64,7 @@ const {isMobilePhone} = useScreenSize();
     padding: 15px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow-y: scroll;
-    overflow-y: auto;
+    //overflow-y: auto;
     width: 100%;
 }
 

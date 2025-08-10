@@ -8,14 +8,15 @@
                 <QuestionShow class="questionShow" @deliverAnswer="judgAnswer" :question="currentQuestion.question"
                     :select="currentQuestion.select" :answer="currentQuestion.answer"
                     :userAnswer="currentQuestion.userAnswer" :chooseRight="currentQuestion.chooseRight"
-                    :id="currentQuestion.id"></QuestionShow>
+                    :id="currentQuestion.id" :key="currentQuestion.id"></QuestionShow>
                 <div class="switchBtn">
                     <button type="button" class="prev-btn" @click="prevQuestion">&lt;</button>
                     <button type="button" class="next-btn" @click="nextQuestion">&gt;</button>
                 </div>
             </div>
             <div :class="isMobilePhone ? 'mbnavPart' : 'navPart'" v-if="queListShow || !isMobilePhone">
-                <QuestionNav :data="data" class="questionNav" :currentQuestion="currentQuestion" @changeQuelistStatus="closeList" />
+                <QuestionNav :data="data" class="questionNav" :currentQuestion="currentQuestion"
+                    @changeQuelistStatus="closeList" />
             </div>
         </div>
         <div :class="isMobilePhone ? 'mbFloor' : 'floor'">
@@ -29,7 +30,8 @@
 
 import { useScreenSize } from '@/hooks/useScreenSize';
 import { onMounted, provide, ref, watchEffect } from 'vue';
-import  type {  QuestionInfo } from '@/types/forQuestion';
+import type { Chapter, ViewInfo as QuestionInfo, } from '@/types/forQuestion';
+import { getJson } from '@/api/pdftoJson';
 const { isMobilePhone } = useScreenSize();
 const headerRef = ref<HTMLElement | null>(null)
 
@@ -79,11 +81,11 @@ let data = ref([{
 const convertShow = ref<boolean>(true);
 const queListShow = ref<boolean>(true);
 let currentQuestion = ref(data.value[0].content.Achoice[0]);
-function updateCurrentQuestion (newQuestion:QuestionInfo){
-    
+function updateCurrentQuestion(newQuestion: QuestionInfo) {
+
     currentQuestion.value = newQuestion;
 }
-provide<(question: QuestionInfo) => void>("updateCurrentQuestion",updateCurrentQuestion);
+provide<(question: QuestionInfo) => void>("updateCurrentQuestion", updateCurrentQuestion);
 function prevQuestion() {
     let [titleNum, typeNum, num] = currentQuestion.value.questionNum.split('-').map(Number);
 
@@ -118,7 +120,7 @@ function nextQuestion() {
         const res = (data.value[titleNum - 1] as any).content[endType];
         num = res.length;
         currentQuestion.value = res[num - 1];
-        console.log(currentQuestion.value)
+        // console.log(currentQuestion.value)
 
     } else {
         num++;
@@ -162,8 +164,32 @@ function closeConvert(status: boolean) {
 function closeList(status: boolean) {
     queListShow.value = status;
 }
-provide<(status: boolean) => void>("closeList",closeList);
-onMounted(() => {
+provide<(status: boolean) => void>("closeList", closeList);
+function getViewData(data: any):Chapter[] {
+    for (let i = 0; i < data.length; i++) {
+        let c = data[i];
+        let qinfo = c.content;
+        function addProp(target: any, num: number) {
+            for (let j = 0; j < target.length; j++) {
+                let q = target[j];
+                q.userAnswer = "";
+                q.chooseRight = false;
+                q.questionNum = `${i+1}-${num}-${j+1}`
+            }
+        }
+        addProp(qinfo.Achoice,1);
+        addProp(qinfo.ManyChoice,2);
+    }
+    return data;
+}
+onMounted(async () => {
+    let res = await getJson("0c83bf87-3a8b-48bb-8294-509af8c26bb7");
+    console.log(res)
+    let qs = JSON.parse(res.data.data);
+    data.value = getViewData(qs);
+    
+    currentQuestion.value = data.value[0].content.Achoice[0]
+    console.log(currentQuestion.value)
 
 })
 
