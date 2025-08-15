@@ -16,7 +16,8 @@ interface TaskState {
   totalTasks: number;
   result?: any;
   currentStr?: string,
-  error?: string
+  error?: string,
+  title:string
 }
 
 // 内存中的任务状态存储
@@ -28,6 +29,8 @@ export class UploadProcessor {
 
   async processPdf(data: { taskId: string; file: Express.Multer.File },prisma:PrismaService) {
     const { taskId, file } = data;
+    const title = file.originalname.split('.')[0];
+    console.log(title)
     // PDF 转换和 AI 处理
     const { answers, questions } = await pdfTostr(file.buffer);
     let res: Pdfdata[] = [];
@@ -41,7 +44,8 @@ export class UploadProcessor {
     // 初始化任务状态
     const task: TaskState = {
       taskId,
-      status: 'processing', progress: 0, totalTasks: questions.length + answers.length, currentStr: "",error:""
+      status: 'processing', progress: 0, totalTasks: questions.length + answers.length, 
+      currentStr: "",error:"", title
     };
     taskStates.set(taskId, task);
     try {
@@ -97,7 +101,7 @@ export class UploadProcessor {
       console.log(prisma)
       // 存储结果到 MySQL
       await prisma.jsonresults.create({
-        data:{ id: taskId, result:JSON.stringify(res) }
+        data:{ id: taskId, result:JSON.stringify(res),title,status:'audit' }
       });
     } catch (error) {
       console.log(error)

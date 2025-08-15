@@ -11,6 +11,8 @@
                     :id="currentQuestion.id" :key="currentQuestion.id"></QuestionShow>
                 <div class="switchBtn">
                     <button type="button" class="prev-btn" @click="prevQuestion">&lt;</button>
+                    <button type="button" class="addq" @click="addErrorqs"
+                        v-if="props.function !== 'errorbook'">保存到错题本</button>
                     <button type="button" class="next-btn" @click="nextQuestion">&gt;</button>
                 </div>
             </div>
@@ -20,7 +22,8 @@
             </div>
         </div>
         <div :class="isMobilePhone ? 'mbFloor' : 'floor'">
-            <QuestionControl @showConvert="toShowConvert()" @showQueList="toShowQueList()" />
+            <QuestionControl @showConvert="toShowConvert()" @showQueList="toShowQueList()"
+                @showErrorBook="enterErrorBook" @cleanNote="cleanNote" @saveNote="saveNote" />
         </div>
     </div>
 
@@ -29,9 +32,14 @@
 <script setup lang='ts'>
 
 import { useScreenSize } from '@/hooks/useScreenSize';
-import { onMounted, provide, ref, watchEffect } from 'vue';
+import { onMounted, provide, ref, watch, watchEffect } from 'vue';
 import type { Chapter, ViewInfo as QuestionInfo, } from '@/types/forQuestion';
-import { getJson } from '@/api/pdftoJson';
+import { getJson, type JsonData } from '@/api/pdftoJson';
+import { getJsonData, saveJsonData, deleteJsonData } from "@/utils/indexDB"
+import { ElMessage } from 'element-plus';
+import { useRouter,useRoute } from 'vue-router';
+const router = useRouter();
+let route = useRoute();
 const { isMobilePhone } = useScreenSize();
 const headerRef = ref<HTMLElement | null>(null)
 
@@ -78,11 +86,15 @@ let data = ref([{
     }
 }])
 
+const props = defineProps<{
+    id?: string,
+    function?: string
+}>();
+
 const convertShow = ref<boolean>(true);
 const queListShow = ref<boolean>(true);
 let currentQuestion = ref(data.value[0].content.Achoice[0]);
 function updateCurrentQuestion(newQuestion: QuestionInfo) {
-
     currentQuestion.value = newQuestion;
 }
 provide<(question: QuestionInfo) => void>("updateCurrentQuestion", updateCurrentQuestion);
@@ -127,6 +139,36 @@ function nextQuestion() {
         currentQuestion.value = thisModule[num - 1];
     }
 }
+async function addErrorqs() {
+    let res: string | null | JsonData = await getJsonData(props.id! + "errorbook");
+    console.log(res)
+    let newBook = null;
+    if (res) {
+        newBook = JSON.parse(res);
+    } else {
+        newBook = JSON.parse(JSON.stringify(data.value));
+        for (const c of newBook) {
+            let content = c.content;
+            content.Achoice = [];
+            content.ManyChoice = [];
+        }
+        console.log(newBook)
+    }
+    let [titleNum, typeNum] = currentQuestion.value.questionNum.split('-').map(Number);
+    const type = typeNum <= 1 ? "Achoice" : "ManyChoice";
+    const thisModule = (newBook[titleNum - 1] as any).content[type];
+    thisModule.push(currentQuestion.value);
+    thisModule.sort((a:any,b:any)=>{
+        let  num1  = a.questionNum.split('-').map(Number)[2];
+        let  num2  = b.questionNum.split('-').map(Number)[2];
+        return num1-num2;
+    })
+    console.log(newBook)
+    let message = await saveJsonData(props.id!+"errorbook", JSON.stringify(newBook));
+    if(message === "success"){
+        ElMessage.success("保存成功");
+    }
+}
 function judgAnswer(answer: string, isRight: boolean) {
     let [titleNum, typeNum, num] = currentQuestion.value.questionNum.split('-').map(Number);
 
@@ -148,6 +190,30 @@ function toShowConvert() {
 function toShowQueList() {
     queListShow.value = true;
 }
+
+async function saveNote() {
+    let res = await saveJsonData(props.id! + props.function, JSON.stringify(data.value));
+    if (res === "success") {
+        ElMessage.success("保存成功");
+    }
+}
+async function cleanNote() {
+    let res = await deleteJsonData(props.id!+props.function);
+    if (res === "success") {
+        ElMessage.success("清除成功");
+    }
+}
+function enterErrorBook() {
+    if (props.function === "errorbook") return;
+    router.push({
+        name: "start",
+        params: {
+            id: props.id,
+            function: "errorbook"
+        }
+
+    })
+}
 watchEffect(() => {
     if (isMobilePhone.value) {
         convertShow.value = false;
@@ -165,33 +231,68 @@ function closeList(status: boolean) {
     queListShow.value = status;
 }
 provide<(status: boolean) => void>("closeList", closeList);
-function getViewData(data: any):Chapter[] {
+function getViewData(data: any): Chapter[] {
     for (let i = 0; i < data.length; i++) {
         let c = data[i];
         let qinfo = c.content;
         function addProp(target: any, num: number) {
             for (let j = 0; j < target.length; j++) {
                 let q = target[j];
-                q.userAnswer = "";
-                q.chooseRight = false;
-                q.questionNum = `${i+1}-${num}-${j+1}`
+                q = {
+                    ...q,
+                    userAnswer: '',
+                    chooseRight: false,
+                    questionNum: `${i + 1}-${num}-${j + 1}`
+                }
+                target[j] = q;
+
             }
         }
-        addProp(qinfo.Achoice,1);
-        addProp(qinfo.ManyChoice,2);
+        addProp(qinfo.Achoice, 1);
+        addProp(qinfo.ManyChoice, 2);
     }
     return data;
 }
-onMounted(async () => {
-    let res = await getJson("0c83bf87-3a8b-48bb-8294-509af8c26bb7");
-    console.log(res)
-    let qs = JSON.parse(res.data.data);
-    data.value = getViewData(qs);
-    
+
+watch(
+  () => route.params, // 监听 params 对象
+  (newParams, oldParams) => {
+    if (newParams !== oldParams) { // 避免重复执行
+      init();
+    }
+  },
+  { deep: true } // 深度监听，确保参数内部变化也能被捕获
+);
+async function  init() {
+    if (props.function === "start") {
+        return;
+    }
+    let res: string | null | JsonData = await getJsonData(props.id! + props.function);
+    if (props.function === "errorbook") {
+        console.log(res)
+        if (res) {
+            data.value = JSON.parse(res);
+        } else {
+            ElMessage.error("还没有添加错题")
+        }
+    }
+    if (props.function === "data") {
+        if (res) {
+            data.value = JSON.parse(res);
+        } else {
+            res = await getJson(props.id);
+
+            let qs = JSON.parse(res.data.data.result);
+            data.value = getViewData(qs);
+            await saveJsonData(props.id!, JSON.stringify(data.value));
+        }
+    }
+    console.log(data.value)
     currentQuestion.value = data.value[0].content.Achoice[0]
     console.log(currentQuestion.value)
 
-})
+}
+onMounted(init)
 
 
 
@@ -285,6 +386,19 @@ onMounted(async () => {
 
                 .prev-btn {
                     background-color: #0d6efd;
+                }
+
+                .addq {
+                    padding: 6px;
+                    height: 100%;
+                    border: none;
+                    border-radius: 4px;
+                    color: white;
+                    background-color: #17a2b8;
+                }
+
+                .addq:hover {
+                    background-color: #138496;
                 }
 
                 .prev-btn:hover {

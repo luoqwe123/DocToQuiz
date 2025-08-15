@@ -2,6 +2,7 @@
 
 import { request } from "@/utils/request";
 import type { JsonData, JsonIds } from "./type";
+export * from "./type"
 
 const baseUrl = "pdfFile/"
 

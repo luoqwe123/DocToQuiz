@@ -26,21 +26,22 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
       client.close();
       return;
     }
-    const interval = setInterval(() => {
-      const task = UploadProcessor.getTaskState(taskId);
+    function doTask() {
+      const task = UploadProcessor.getTaskState(taskId!);
       if (task) {
         client.send(JSON.stringify({
           taskId: task.taskId,
           status: task.status,
           progress: task.progress,
           totalTasks: task.totalTasks,
-          result: task.result,
+          title: task.title,
+          // result: task.result,
           currentStr: task.currentStr ? task.currentStr : "无错误不显示",
           error: task.error ? task.error : "无错误",
         }));
         if (task.status === 'completed' || task.status === 'failed') {
           clearInterval(interval);
-          UploadProcessor.clearTaskState(taskId); // 清理内存
+          UploadProcessor.clearTaskState(taskId!); // 清理内存
           client.close();
         }
       } else {
@@ -52,8 +53,9 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
         clearInterval(interval);
         client.close();
       }
-    }, 60000); // 每分钟推送一次
-
+    }
+    const interval = setInterval(doTask, 60000); // 每分钟推送一次
+    doTask()
 
   }
 }

@@ -59,28 +59,36 @@ function processText(text: string, maxChunkSize: number): ChunkType[] {
 
 
 function processAnswer(text: string, maxChunkSize: number) {
+    console.log(text)
     let position = 0; // 当前位置
     const result: any = []; // 存储分块结果
     let flag = false;
     while (position < text.length) {
         // 计算初步结束位置
+        console.log(position,text.length)
         let tentativeEnd = position + maxChunkSize;
-        if(flag) break
+        if(flag) break;
         if (tentativeEnd > text.length) {
             tentativeEnd = text.length; // 超出文本长度时调整为文本末尾
             flag = true
         }
         // 提取当前分块
-        const substring = text.substring(position, tentativeEnd);
+        let substring = text.substring(position, tentativeEnd);
+        substring = substring.split(' ').filter(item=> item).join(' ')
+        console.log(substring)
+
+        console.log(substring.length,substring[substring.length-1])
+      
         let i = substring.length;
         if (!flag) {
             i--;
-            while (!(/\d/.test(substring[i])&&/[a-dA-D]/.test(substring[i-1]))) {      
-                i--
+            while (!(/\d/.test(substring[i])&&!/\d/.test(substring[i-1])&&/[a-dA-D]/.test(substring[i-2]))&&i>0) {
+                i--;
             }
         }
         // 提取分块内容
         let chunk = substring.substring(0, i);
+        console.log(chunk)
         result.push({
             chunk: chunk, // 分块内容
             endPosition: position+i // 结束位置
@@ -129,6 +137,8 @@ export async function pdfTostr(buffer: Buffer) {
     const text: string[] = data.text.trim().split("\n").filter((item: string) => item.trim().length > 0);
     const { answers, cleanedText } = deleteAnswer(text);
     let endAnswers = processAnswer(answers, 400);
+    console.log(endAnswers)
     const endTextArray = processText(cleanedText, 2800);
+    
     return { answers:endAnswers, questions: endTextArray };
 }

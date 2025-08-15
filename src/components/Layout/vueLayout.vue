@@ -11,7 +11,9 @@
                 <button type="button" class="start" @click="goStart">开始使用</button>
             </div>
             <div class="content">
-                <ExampleCom style="width: 220px;height: 120px;"></ExampleCom>
+                <ExampleCom 
+                v-for="item in datas"  :title="item.title" :description="item.describe" :key="item.id"
+                style="width: 220px;height: 120px;cursor: pointer;" @click="enter(item.id)"></ExampleCom>
             </div>
         </div>
 
@@ -21,17 +23,38 @@
 <script setup lang='ts'>
 
 import { useRouter } from 'vue-router';
-
+import { ref ,onMounted} from 'vue';
+import { getAllId ,type baseInfo} from "@/api/pdftoJson"
 const router= useRouter();
+
+let datas  = ref<baseInfo[]>();
 
 const goStart = ()=>{
     router.push({
         name:"start",
         params:{
+            id:"",
             function:"start"
         }
     })
 }
+
+function enter(id:string){
+    console.log(id)
+    router.push({
+        name:"start",
+        params:{
+            id: id,
+            function:"data"
+        },
+        
+    })
+}
+onMounted(async ()=>{
+    let res = await getAllId();
+    console.log(res.data)
+    datas.value = res.data.data;
+})
 
 
 </script>

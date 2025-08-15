@@ -13,8 +13,9 @@ export const routes = [
         name:"login"
     },
     {
-        path:"/show/:function" ,
+        path:"/show/:id?/:function?" ,
         component: ()=> import('../view/corePart.vue'),
-        name:"start"
+        name:"start",
+        props:true
     }
 ]

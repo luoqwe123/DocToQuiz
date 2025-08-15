@@ -14,8 +14,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Jsonresults {
   id        String   @id @db.VarChar(255) // 对应 VARCHAR(255) 主键
   result    Json?    // JSON 类型，允许为 null
   createdAt DateTime @default(now())
+  title     String?   @db.VarChar(100)  
+  descript  String?   @db.VarChar(255)
+  
+
+  uploaderId String?                 // 上传者 ID，外键关联 Users 表
+  editorId   String?                // 编辑者 ID，外键关联 Users 表，可选（文章可能无编辑者）
+  status   String?    // audit     published
+
+  uploader   Users?     @relation("Uploader", fields: [uploaderId], references: [id])  // 关联上传者
+  editor     Users?    @relation("Editor", fields: [editorId], references: [id])
+  @@index([uploaderId])  // 为上传者 ID 添加索引，提高查询效率
+  @@index([editorId])    // 为编辑者 ID 添加索引，提高查询效率
+}
+model Users {
+  id         String    @id @default(uuid())  // 用户唯一 ID，使用 UUID 生成
+  username   String    @unique  // 用户名，唯一
+  email      String    @unique  // 邮箱，唯一
+  password   String                // 密码（哈希存储）
+  role       String?               // 角色（如 "uploader"、"editor"、"admin"），可选
+  createdAt  DateTime  @default(now())  // 创建时间
+  updatedAt  DateTime  @updatedAt  // 更新时间
+  privileges  Int
+
+  uploadedArticles  Jsonresults[] @relation("Uploader")  // 一对多：该用户上传的文章
+  editedArticles    Jsonresults[] @relation("Editor")    // 一对多：该用户编辑的文章
 }

@@ -1,10 +1,10 @@
 <template>
     <div class="Control-container">
-        <button type="button" class="saveNote">保存做题记录</button>
-        <button type="button" class="cleanNote">清除做题记录</button>
+        <button type="button" class="saveNote" @click="emits('saveNote')">保存做题记录</button>
+        <button type="button" class="cleanNote" @click="emits('cleanNote')">清除做题记录</button>
         <button type="button" class="convert" v-if="isMobilePhone" @click="showConvert">转化</button>
         <button type="button" class="questionList" v-if="isMobilePhone" @click="showQueList">题列表</button>
-        <button type="button" class="note">错题本</button>
+        <button type="button" class="note" @click="emits('showErrorBook')">错题本</button>
         <button type="button" class="homePage" @click="goHome">首页</button>
     </div>
 </template>
@@ -17,11 +17,14 @@ const router = useRouter();
 
 const { isMobilePhone } = useScreenSize();
 
-const emits = defineEmits(["showConvert","showQueList"])
+const emits = defineEmits(["showConvert","showQueList","saveNote","cleanNote","showErrorBook"])
 
 function goHome() {
     router.push({ path: "/" });
 }
+
+
+
 
 function showConvert() {
     emits("showConvert",)
