@@ -2,17 +2,17 @@
 
 import axios from "axios";
 
-import { GET_TOKEN, } from "./token";
+// import { GET_TOKEN, } from "./token";
 
 export const request  = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 5000
 })
 request.interceptors.request.use((config)=>{
-    const token = GET_TOKEN()
-    if(token){
-        config.headers.Authorization = token
-    }
+    // const token = GET_TOKEN()
+    // if(token){
+    //     config.headers.Authorization = token
+    // }
     return config
 })
 

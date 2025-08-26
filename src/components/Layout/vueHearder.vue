@@ -1,9 +1,5 @@
 <template>
-  <header
-    class="header"
-    :class="{ 'header-fixed': isScrolled }"
-    ref="headerRef"
-  >
+  <header class="header" :class="{ 'header-fixed': isScrolled }" ref="headerRef">
     <div class="header-content container">
       <div class="logo">
         <span>DocToQuiz</span>
@@ -16,28 +12,18 @@
           <img class="avatar" :src="props.avatar" alt="用户头像" />
         </div>
         <div class="auth-buttons">
-          <el-button type=""  @click="login">登录</el-button>
+          <el-button type="" @click="login">登录</el-button>
           <el-button type="primary" @click="register">注册</el-button>
         </div>
       </nav>
 
       <!-- 移动端菜单按钮 -->
-      <ShrinkButton
-        style="width: 16px;height: 16px;"
-        v-else
-        type="primary"
-        icon="Menu"
-        @click="drawerVisible = true"
-      ></ShrinkButton>
+      <ShrinkButton style="width: 16px;height: 16px;" v-else type="primary" icon="Menu" @click="drawerVisible = true">
+      </ShrinkButton>
     </div>
 
     <!-- 移动端抽屉菜单 -->
-    <el-drawer
-      title="用户菜单"
-      v-model="drawerVisible"
-      direction="rtl"
-      size="100%"
-    >
+    <el-drawer title="用户菜单" v-model="drawerVisible" direction="rtl" size="100%">
       <template #default>
         <div class="mobile-user-info" v-if="isLoggedIn">
           <img class="avatar" :src="props.avatar" alt="用户头像" />
@@ -56,12 +42,12 @@
 import { ref, onMounted, onUnmounted, } from 'vue';
 
 const props = withDefaults(defineProps<{
-  username:string,
-  avatar:string
-}>(),{
-  username:"访客",
-  avatar:`@/../public/${Math.ceil(Math.random()*10)%4+140}.webp`
-})
+  username: string,
+  avatar: string
+}>(), {
+    username: "访客",
+    avatar: `@/../public/${Math.ceil(Math.random() * 10) % 4 + 140}.webp`
+});
 
 
 // 组件状态
@@ -76,38 +62,38 @@ const isLoggedIn = ref(false);
 
 // 响应式处理
 const handleResize = () => {
-  isMobile.value = window.innerWidth < 768;
+    isMobile.value = window.innerWidth < 768;
 };
 
 // 滚动处理
 const handleScroll = () => {
-  if (headerRef.value) {
-    isScrolled.value = window.scrollY > 10;
-  }
+    if (headerRef.value) {
+        isScrolled.value = window.scrollY > 10;
+    }
 };
 
 // 生命周期钩子
 onMounted(() => {
-  handleResize();
-  handleScroll();
-  window.addEventListener('resize', handleResize);
-  window.addEventListener('scroll', handleScroll);
+    handleResize();
+    handleScroll();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-  window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('scroll', handleScroll);
 });
 
 // 登录注册方法
 const login = () => {
-  console.log('登录');
-//   drawerVisible.value = false;
+    // console.log('登录');
+    //   drawerVisible.value = false;
 };
 
 const register = () => {
-  console.log('注册');
-//   drawerVisible.value = false;
+    // console.log('注册');
+    //   drawerVisible.value = false;
 };
 </script>
 
@@ -120,6 +106,7 @@ const register = () => {
   top: 0;
   z-index: 100;
   padding: 16px 10px;
+
   &-fixed {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid #e2e2e3;

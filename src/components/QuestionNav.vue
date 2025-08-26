@@ -21,9 +21,9 @@ const props = withDefaults(defineProps<{
     currentQuestion: QuestionInfo
 }>(), {
 
-})
+});
 
-const emits = defineEmits(["changeQuelistStatus"])
+const emits = defineEmits(["changeQuelistStatus"]);
 
 
 function closeList() {

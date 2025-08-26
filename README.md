@@ -17,7 +17,7 @@ DocToQuiz是一个基于AI的智能文档转换系统，能够将PDF文档自动
 - NestJS 框架
 - Prisma ORM 数据库操作
 - WebSocket 实时通信
-- Bull 队列处理
+
 
 ## 功能特点
 

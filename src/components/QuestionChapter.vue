@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang='ts'>
-import { inject } from 'vue'
+import { inject } from 'vue';
 import  type {  ViewInfo,Chapter } from '@/types/forQuestion';
 
 
@@ -69,10 +69,10 @@ const props = withDefaults(defineProps<{
                     },
                 ]
             }
-        }
+        };
     },
     locate:"1-1-1"
-})
+});
 
 const updateCurrentQuestion = inject<(question: ViewInfo) => void>("updateCurrentQuestion")!;
 const clostList = inject<(status: boolean) => void>("closeList")!;

@@ -24,7 +24,7 @@
 
 import { useRouter } from 'vue-router';
 import { ref ,onMounted} from 'vue';
-import { getAllId ,type baseInfo} from "@/api/pdftoJson"
+import { getAllId ,type baseInfo} from "@/api/pdftoJson";
 const router= useRouter();
 
 let datas  = ref<baseInfo[]>();
@@ -36,11 +36,11 @@ const goStart = ()=>{
             id:"",
             function:"start"
         }
-    })
-}
+    });
+};
 
 function enter(id:string){
-    console.log(id)
+    // console.log(id);
     router.push({
         name:"start",
         params:{
@@ -48,13 +48,13 @@ function enter(id:string){
             function:"data"
         },
         
-    })
+    });
 }
 onMounted(async ()=>{
     let res = await getAllId();
-    console.log(res.data)
+    // console.log(res.data);
     datas.value = res.data.data;
-})
+});
 
 
 </script>

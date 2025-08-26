@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<{
         "B": "列宁主义",
         "C": "xxx",
         "D": "yyy"
-    }},
+    };},
     answer: "B",
     userAnswer:"C",
     chooseRight:false
@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<{
 const $emits = defineEmits(["deliverAnswer"]);
 
 const showAnswer = ref<boolean>(false);
-const c_userAnswer = ref<string>("")
+const c_userAnswer = ref<string>("");
 
 const judg = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -58,7 +58,7 @@ const judg = (event: Event) => {
     c_userAnswer.value = target.value;
     $emits("deliverAnswer", c_userAnswer.value,c_userAnswer.value == props.answer);
 
-}
+};
 
 
 // 监听 props.question 变化，重置状态

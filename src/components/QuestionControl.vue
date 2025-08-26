@@ -17,7 +17,7 @@ const router = useRouter();
 
 const { isMobilePhone } = useScreenSize();
 
-const emits = defineEmits(["showConvert","showQueList","saveNote","cleanNote","showErrorBook"])
+const emits = defineEmits(["showConvert","showQueList","saveNote","cleanNote","showErrorBook"]);
 
 function goHome() {
     router.push({ path: "/" });
@@ -27,10 +27,10 @@ function goHome() {
 
 
 function showConvert() {
-    emits("showConvert",)
+    emits("showConvert",);
 }
 function showQueList(){
-    emits("showQueList")
+    emits("showQueList");
 }
 
 </script>

@@ -25,19 +25,19 @@ const { isMobilePhone } = useScreenSize();
 // import   pdf   from "pdf-parse";
 // import fs from "fs";
 
-interface targetFile{
+interface TargetFile{
     info:File|null,
     path:string
 }
-const emits = defineEmits(["changeConvertStatus"])
+const emits = defineEmits(["changeConvertStatus"]);
 
 const fileInputRef = ref<HTMLInputElement|null>(null);
-const targetFile = ref<targetFile>({info:null,path:""});
+const targetFile = ref<TargetFile>({info:null,path:""});
 
 
 const closeConvert = ()=>{
     emits("changeConvertStatus",false);
-}
+};
 
 function selectPdf(){
     if(fileInputRef.value){
@@ -50,9 +50,10 @@ function checkFile(event:Event){
 
 async function convert(){
     if(targetFile.value){
-        console.log(targetFile.value)
-        const res = await upload(targetFile.value.info!);
-        console.log(res.data)
+        // console.log(targetFile.value);
+        // const res =
+        await upload(targetFile.value.info!);
+        // console.log(res.data);
         // const dataBuffer =  fs.readFileSync(targetFile.value.path);
         // const strs = await pdf(dataBuffer as Buffer);
         // console.log(strs)
@@ -63,7 +64,7 @@ onMounted(()=>{
         fileInputRef.value.addEventListener("change",checkFile);
     }
     
-})
+});
 
 
 </script>

@@ -2,9 +2,9 @@
 
 import { request } from "@/utils/request";
 import type { JsonData, JsonIds } from "./type";
-export * from "./type"
+export * from "./type";
 
-const baseUrl = "pdfFile/"
+const baseUrl = "pdfFile/";
 
 enum API {
     GETJSON_URL = baseUrl + "find",

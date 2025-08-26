@@ -17,21 +17,22 @@ export default defineConfig([
   },
   tseslint.configs.recommended,
   pluginVue.configs["flat/essential"],
-  { files: ["src/*.{js,mjs,cjs,ts,vue}"], plugins: { js }, extends: ["js/recommended"] },
-  
- 
+  { files: ["src/**/*.{js,mjs,cjs,ts,vue}"], plugins: { js }, extends: ["js/recommended"] },
   {
-    files: ["src/*.{js,mjs,cjs,ts,vue}"],
+    files: ["src/**/*.{js,mjs,cjs,ts,vue}"],
     languageOptions: { globals: globals.browser },
     rules: {
       indent: ["error", 4], // 缩进 2 个空格
       semi: ["error", "always"], // 强制分号
       "no-console": ["error"], // 允许 .js 文件中使用 console
       "no-require": "off", // 允许使用 require
-      
       "prefer-const":"off",
       "@typescript-eslint/no-explicit-any": "off",
+      "no-unused-vars":'off'
     },
   },
-  { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser } },rules:{ "@typescript-eslint/no-explicit-any": "off", } },
+  { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser } },rules:{ 
+    "@typescript-eslint/no-explicit-any": "off",
+      "no-unused-vars":"off"
+   } },
 ]);

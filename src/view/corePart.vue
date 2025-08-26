@@ -35,13 +35,13 @@ import { useScreenSize } from '@/hooks/useScreenSize';
 import { onMounted, provide, ref, watch, watchEffect } from 'vue';
 import type { Chapter, ViewInfo as QuestionInfo, } from '@/types/forQuestion';
 import { getJson, type JsonData } from '@/api/pdftoJson';
-import { getJsonData, saveJsonData, deleteJsonData } from "@/utils/indexDB"
+import { getJsonData, saveJsonData, deleteJsonData } from "@/utils/indexDB";
 import { ElMessage } from 'element-plus';
-import { useRouter,useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 let route = useRoute();
 const { isMobilePhone } = useScreenSize();
-const headerRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null);
 
 let data = ref([{
     name: "daolun",
@@ -84,7 +84,7 @@ let data = ref([{
             },
         ]
     }
-}])
+}]);
 
 const props = defineProps<{
     id?: string,
@@ -141,7 +141,7 @@ function nextQuestion() {
 }
 async function addErrorqs() {
     let res: string | null | JsonData = await getJsonData(props.id! + "errorbook");
-    console.log(res)
+    // console.log(res);
     let newBook = null;
     if (res) {
         newBook = JSON.parse(res);
@@ -152,20 +152,20 @@ async function addErrorqs() {
             content.Achoice = [];
             content.ManyChoice = [];
         }
-        console.log(newBook)
+        // console.log(newBook);
     }
     let [titleNum, typeNum] = currentQuestion.value.questionNum.split('-').map(Number);
     const type = typeNum <= 1 ? "Achoice" : "ManyChoice";
     const thisModule = (newBook[titleNum - 1] as any).content[type];
     thisModule.push(currentQuestion.value);
-    thisModule.sort((a:any,b:any)=>{
-        let  num1  = a.questionNum.split('-').map(Number)[2];
-        let  num2  = b.questionNum.split('-').map(Number)[2];
-        return num1-num2;
-    })
-    console.log(newBook)
-    let message = await saveJsonData(props.id!+"errorbook", JSON.stringify(newBook));
-    if(message === "success"){
+    thisModule.sort((a: any, b: any) => {
+        let num1 = a.questionNum.split('-').map(Number)[2];
+        let num2 = b.questionNum.split('-').map(Number)[2];
+        return num1 - num2;
+    });
+    // console.log(newBook);
+    let message = await saveJsonData(props.id! + "errorbook", JSON.stringify(newBook));
+    if (message === "success") {
         ElMessage.success("保存成功");
     }
 }
@@ -180,7 +180,7 @@ function judgAnswer(answer: string, isRight: boolean) {
 
     if (isRight) setTimeout(() => {
         nextQuestion();
-    }, 300)
+    }, 300);
 
 }
 
@@ -198,7 +198,7 @@ async function saveNote() {
     }
 }
 async function cleanNote() {
-    let res = await deleteJsonData(props.id!+props.function);
+    let res = await deleteJsonData(props.id! + props.function);
     if (res === "success") {
         ElMessage.success("清除成功");
     }
@@ -212,7 +212,7 @@ function enterErrorBook() {
             function: "errorbook"
         }
 
-    })
+    });
 }
 watchEffect(() => {
     if (isMobilePhone.value) {
@@ -222,7 +222,7 @@ watchEffect(() => {
         convertShow.value = true;
         queListShow.value = true;
     }
-})
+});
 
 function closeConvert(status: boolean) {
     convertShow.value = status;
@@ -243,7 +243,7 @@ function getViewData(data: any): Chapter[] {
                     userAnswer: '',
                     chooseRight: false,
                     questionNum: `${i + 1}-${num}-${j + 1}`
-                }
+                };
                 target[j] = q;
 
             }
@@ -255,25 +255,25 @@ function getViewData(data: any): Chapter[] {
 }
 
 watch(
-  () => route.params, // 监听 params 对象
-  (newParams, oldParams) => {
-    if (newParams !== oldParams) { // 避免重复执行
-      init();
-    }
-  },
-  { deep: true } // 深度监听，确保参数内部变化也能被捕获
+    () => route.params, // 监听 params 对象
+    (newParams, oldParams) => {
+        if (newParams !== oldParams) { // 避免重复执行
+            init();
+        }
+    },
+    { deep: true } // 深度监听，确保参数内部变化也能被捕获
 );
-async function  init() {
+async function init() {
     if (props.function === "start") {
         return;
     }
     let res: string | null | JsonData = await getJsonData(props.id! + props.function);
     if (props.function === "errorbook") {
-        console.log(res)
+        // console.log(res)
         if (res) {
             data.value = JSON.parse(res);
         } else {
-            ElMessage.error("还没有添加错题")
+            ElMessage.error("还没有添加错题");
         }
     }
     if (props.function === "data") {
@@ -281,18 +281,17 @@ async function  init() {
             data.value = JSON.parse(res);
         } else {
             res = await getJson(props.id);
-
             let qs = JSON.parse(res.data.data.result);
             data.value = getViewData(qs);
             await saveJsonData(props.id!, JSON.stringify(data.value));
         }
     }
-    console.log(data.value)
-    currentQuestion.value = data.value[0].content.Achoice[0]
-    console.log(currentQuestion.value)
+    // console.log(data.value)
+    currentQuestion.value = data.value[0].content.Achoice[0];
+    // console.log(currentQuestion.value)
 
 }
-onMounted(init)
+onMounted(init);
 
 
 

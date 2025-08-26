@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
 }>(),{
     title:"大二下 - 毛概",
     description:"这个是25年计院毛概的题库"
-})
+});
 
 
 </script>

@@ -17,13 +17,13 @@ export function useScreenSize() {
     onMounted(() => {
         checkScreen();
         window.addEventListener('resize', checkScreen);
-    })
+    });
     onUnmounted(()=>{
         window.removeEventListener("resize",checkScreen);
-    })
+    });
     return {
         isMobilePhone,
         screenHeight,
         screenWidth
-    }
+    };
 }

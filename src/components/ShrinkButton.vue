@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<{
     backColor:string
 }>(),{
     backColor:"#3c3c43"
-})
+});
 
 </script>
 

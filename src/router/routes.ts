@@ -18,4 +18,4 @@ export const routes = [
         name:"start",
         props:true
     }
-]
+];
