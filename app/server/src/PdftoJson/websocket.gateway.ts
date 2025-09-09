@@ -37,7 +37,8 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
           title: task.title,
           // result: task.result,
           currentStr: task.currentStr ? task.currentStr : "无错误不显示",
-          error: task.error ? task.error : "无错误",
+          errorinfo: task.error ? task.error : "无错误",
+          error: task.error && false
         }));
         if (task.status === 'completed' || task.status === 'failed') {
           clearInterval(interval);
@@ -54,7 +55,7 @@ export class TaskWebSocketGateway implements OnGatewayConnection {
         client.close();
       }
     }
-    const interval = setInterval(doTask, 60000); // 每分钟推送一次
+    const interval = setInterval(doTask, 10000); // 每分钟推送一次
     doTask()
 
   }

@@ -24,7 +24,7 @@ export const fetchStream = async (questions: string,type:number) :Promise<{ code
                 ],
             },
         ],
-        model: "ep-20250808101721-t7hlx", // DOUbao1.5
+        model: "ep-20250909200603-8c9c4", // dou-seed-1.6-think
         // stream: true, // 启用流式传输
         // max_tokens: 10000,
     };

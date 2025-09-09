@@ -12,8 +12,8 @@
     "fix": "eslint --fix",
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",
-    "dev:server": "pnpm --filter server start:dev"
-     
+    "dev:server": "pnpm --filter server start:dev",
+    "dev:pro": "vite -m production"
   },
   "keywords": [],
   "author": "",
@@ -41,8 +41,8 @@
     "@vue/tsconfig": "^0.7.0",
     "axios": "^1.10.0",
     "element-plus": "^2.10.4",
+    "pinia": "^3.0.3",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   }
-  
 }

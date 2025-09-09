@@ -25,7 +25,7 @@ export async function upload(file: File): Promise<any> {
     //   loadingStore.setProgress(100);
 
     function connectWebSocket(taskId: string) {
-    ws = new WebSocket(`ws://localhost:3001/api/task?taskId=${taskId}`);
+    ws = new WebSocket(`${import.meta.env.VITE_WS_API_BASE_URL }task?taskId=${taskId}`);
     ws.onmessage = (event) => {
       console.log(event.data)
       const data = JSON.parse(event.data);

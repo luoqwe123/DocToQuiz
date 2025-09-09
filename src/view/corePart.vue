@@ -282,6 +282,7 @@ async function init() {
         } else {
             res = await getJson(props.id);
             let qs = JSON.parse(res.data.data.result);
+            // console.log(qs);
             data.value = getViewData(qs);
             await saveJsonData(props.id!, JSON.stringify(data.value));
         }
